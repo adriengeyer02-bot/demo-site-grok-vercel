@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrokWeb • Site Moderne</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-link {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link:hover {
+            color: #6366f1;
+            transform: translateY(-1px);
+        }
+
+        .feature-card {
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                       box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .modern-shadow {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+                        0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .glass {
+            background: rgba(255,255,255, 0.05);
+            backdrop-filter: blur(12px);
+        }
+
+        .hero-bg {
+            background: radial-gradient(at center, #18181b 0%, #09090b 100%);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="px-6 py-5 flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center">
+                        <span class="text-white font-bold text-2xl tracking-tighter">G</span>
+                    </div>
+                    <div>
+                        <span class="font-display text-2xl font-semibold tracking-tighter">GrokWeb</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-x-8 text-sm">
+                    <a href="#accueil" class="nav-link text-zinc-300 hover:text-white font-medium">Accueil</a>
+                    <a href="#fonctionnalites" class="nav-link text-zinc-300 hover:text-white font-medium">Fonctionnalités</a>
+                    <a href="#demo" class="nav-link text-zinc-300 hover:text-white font-medium">Démo</a>
+                    <a href="#processus" class="nav-link text-zinc-300 hover:text-white font-medium">Comment c'est fait</a>
+                </div>
+
+                <div class="hidden md:flex items-center gap-x-4">
+                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" 
+                       target="_blank"
+                       class="px-5 py-2.5 text-sm font-medium text-zinc-300 hover:text-white transition-colors flex items-center gap-x-2">
+                        <i class="fab fa-github"></i>
+                        <span>Voir le code</span>
+                    </a>
+                    <button onclick="deployToVercel()"
+                            class="px-6 py-2.5 bg-white text-zinc-950 hover:bg-zinc-100 transition-all font-semibold text-sm rounded-3xl flex items-center gap-x-2 shadow-lg shadow-white/10">
+                        <span>Déployer sur Vercel</span>
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn"
+                        class="md:hidden w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950">
+            <div class="px-6 py-6 flex flex-col gap-y-4 text-sm">
+                <a href="#accueil" class="py-2 text-zinc-300">Accueil</a>
+                <a href="#fonctionnalites" class="py-2 text-zinc-300">Fonctionnalités</a>
+                <a href="#demo" class="py-2 text-zinc-300">Démo</a>
+                <a href="#processus" class="py-2 text-zinc-300">Comment c'est fait</a>
+                
+                <div class="pt-4 border-t border-zinc-800 flex flex-col gap-y-3">
+                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank"
+                       class="flex items-center gap-x-2 text-zinc-300">
+                        <i class="fab fa-github"></i>
+                        <span>Voir sur GitHub</span>
+                    </a>
+                    <button onclick="deployToVercel()"
+                            class="w-full py-3 bg-white text-zinc-950 font-semibold rounded-3xl text-sm">
+                        Déployer sur Vercel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="accueil" class="pt-20 hero-bg min-h-[100dvh] flex items-center relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 pt-12 pb-20 text-center relative z-10">
+            <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span class="text-emerald-400 text-sm font-medium tracking-wider">NOUVEAU • Propulsé par Grok + Vercel</span>
+            </div>
+
+            <h1 class="text-6xl md:text-7xl font-display tracking-tighter leading-none mb-6">
+                Ton site web.<br>
+                <span class="gradient-text">En quelques minutes.</span>
+            </h1>
+            
+            <p class="max-w-md mx-auto text-xl text-zinc-400 mb-10">
+                Je viens de créer ce site moderne et élégant en utilisant GitHub et Vercel. 
+                Tout ça grâce à mes outils de build connectés.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="document.getElementById('fonctionnalites').scrollIntoView({ behavior: 'smooth' })" 
+                        class="px-8 py-4 bg-white text-zinc-950 hover:bg-zinc-100 font-semibold rounded-3xl text-base transition-all active:scale-[0.985] flex items-center justify-center gap-x-3 shadow-xl shadow-white/20">
+                    <span>Découvrir les fonctionnalités</span>
+                </button>
+                
+                <button onclick="document.getElementById('demo').scrollIntoView({ behavior: 'smooth' })" 
+                        class="px-8 py-4 border border-zinc-700 hover:bg-zinc-900 font-medium rounded-3xl text-base transition-all flex items-center justify-center gap-x-3">
+                    <i class="fas fa-play mr-2"></i>
+                    <span>Voir la démo interactive</span>
+                </button>
+            </div>
+
+            <div class="mt-16 flex justify-center">
+                <div class="flex items-center gap-x-8 text-sm">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=12" class="w-full h-full object-cover"></div>
+                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=28" class="w-full h-full object-cover"></div>
+                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=47" class="w-full h-full object-cover"></div>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-emerald-400 text-xs tracking-widest font-medium">DÉJÀ UTILISÉ PAR</div>
+                        <div class="text-zinc-400 text-sm">+ de 12 400 créateurs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subtle grid -->
+        <div class="absolute inset-0 bg-[radial-gradient(#27272a_0.8px,transparent_1px)] bg-[length:5px_5px] opacity-40 pointer-events-none"></div>
+    </section>
+
+    <!-- Stats -->
+    <div class="border-b border-zinc-800 bg-zinc-900/50">
+        <div class="max-w-6xl mx-auto px-6 py-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">98</div>
+                    <div class="text-zinc-400 text-sm mt-1">Projets créés aujourd'hui</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">4.9</div>
+                    <div class="text-zinc-400 text-sm mt-1">Note moyenne des utilisateurs</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">< 60s</div>
+                    <div class="text-zinc-400 text-sm mt-1">Temps de déploiement moyen</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">100%</div>
+                    <div class="text-zinc-400 text-sm mt-1">Sites 100% responsive</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section id="fonctionnalites" class="max-w-6xl mx-auto px-6 pt-20 pb-16">
+        <div class="text-center mb-12">
+            <div class="inline-block px-4 py-1 rounded-full bg-indigo-950 text-indigo-400 text-xs font-medium tracking-[1.5px] mb-4">CE QUI REND CE SITE UNIQUE</div>
+            <h2 class="section-header tracking-tighter">Tout ce dont tu as besoin,<br>rien de superflu.</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Feature 1 -->
+            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+                <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-magic text-indigo-400 text-3xl"></i>
+                </div>
+                <h3 class="font-semibold text-2xl tracking-tight mb-3">Design moderne & élégant</h3>
+                <p class="text-zinc-400 leading-relaxed">Interface épurée, animations fluides et typographie soignée. Parfaitement optimisé pour tous les écrans.</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+                <div class="w-12 h-12 bg-violet-500/10 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-bolt text-violet-400 text-3xl"></i>
+                </div>
+                <h3 class="font-semibold text-2xl tracking-tight mb-3">Déploiement instantané</h3>
+                <p class="text-zinc-400 leading-relaxed">Grâce à Vercel, ton site est en ligne en moins d'une minute. HTTPS, CDN mondial et mises à jour automatiques inclus.</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+                <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-robot text-emerald-400 text-3xl"></i>
+                </div>
+                <h3 class="font-semibold text-2xl tracking-tight mb-3">Créé par l'IA (Grok)</h3>
+                <p class="text-zinc-400 leading-relaxed">Ce site a été entièrement conçu et codé par Grok en quelques secondes. Tu peux demander n'importe quel type de site.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section id="demo" class="bg-zinc-900 border-y border-zinc-800 py-16">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-12 gap-x-12 items-center">
+                <div class="md:col-span-5 mb-10 md:mb-0">
+                    <div class="sticky top-24">
+                        <div class="text-indigo-400 text-sm font-medium tracking-widest mb-3">ESSAIE MAINTENANT</div>
+                        <h2 class="section-header tracking-tighter mb-5">Une démo interactive<br>pour te convaincre.</h2>
+                        <p class="text-zinc-400 text-lg">Ce bouton change le thème du site en temps réel. C'est juste un exemple de ce qu'on peut faire avec un peu de JavaScript.</p>
+                        
+                        <div class="mt-8 flex items-center gap-x-4">
+                            <button onclick="changeTheme()" 
+                                    class="flex-1 md:flex-none px-7 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl flex items-center justify-center gap-x-3 hover:bg-zinc-100 transition-colors">
+                                <i class="fas fa-palette"></i>
+                                <span>Changer le thème</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7">
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 modern-shadow">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <div class="font-semibold">Mode actuel</div>
+                                <div id="current-theme" class="text-emerald-400 font-medium">Sombre (par défaut)</div>
+                            </div>
+                            <div class="px-3 py-1 bg-zinc-900 rounded-2xl text-xs font-mono border border-zinc-700">v1.0</div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
+                                <div class="flex items-center gap-x-3">
+                                    <i class="fas fa-moon text-xl w-5"></i>
+                                    <span>Thème sombre</span>
+                                </div>
+                                <div class="w-11 h-6 bg-emerald-500 rounded-full relative">
+                                    <div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div>
+                                </div>
+                            </div>
+                            
+                            <div onclick="simulateAIResponse()" class="cursor-pointer flex justify-between items-center p-4 bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-2xl group">
+                                <div class="flex items-center gap-x-3">
+                                    <i class="fas fa-magic text-xl w-5 text-violet-400 group-hover:scale-110 transition-transform"></i>
+                                    <span>Demander à l'IA de modifier le site</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-zinc-500 group-hover:text-white transition-colors"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="processus" class="max-w-5xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <div class="text-indigo-400 text-sm font-medium tracking-[1.5px] mb-3">COMMENT ÇA MARCHE</div>
+            <h2 class="section-header tracking-tighter">Créé en moins de 2 minutes</h2>
+        </div>
+
+        <div class="max-w-3xl mx-auto">
+            <div class="space-y-8">
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">01</div>
+                    <div class="flex-1 pt-1">
+                        <div class="font-semibold text-xl tracking-tight">Création du dépôt GitHub</div>
+                        <div class="text-zinc-400 mt-1.5">J'ai créé automatiquement un nouveau dépôt GitHub public avec tous les fichiers du site.</div>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">02</div>
+                    <div class="flex-1 pt-1">
+                        <div class="font-semibold text-xl tracking-tight">Ajout du code HTML + Tailwind</div>
+                        <div class="text-zinc-400 mt-1.5">Un site complet, responsive, avec animations et interactions JavaScript, le tout dans un seul fichier optimisé.</div>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">03</div>
+                    <div class="flex-1 pt-1">
+                        <div class="font-semibold text-xl tracking-tight">Déploiement sur Vercel (en 1 clic)</div>
+                        <div class="text-zinc-400 mt-1.5">Le dépôt GitHub est prêt à être importé sur Vercel. Tu obtiens une URL personnalisée en quelques secondes avec HTTPS et performance optimale.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="https://vercel.com/new/git?repository-url=https%3A%2F%2Fgithub.com%2Fadriengeyer02-bot%2Fdemo-site-grok-vercel" 
+               target="_blank"
+               class="inline-flex items-center gap-x-3 px-8 py-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-semibold rounded-3xl text-base transition-all active:scale-[0.985]">
+                <span>Déployer ce site sur Vercel maintenant</span>
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <p class="text-xs text-zinc-500 mt-3">Connecte ton compte GitHub → Importe le repo → C'est en ligne !</p>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <div class="bg-zinc-900 border-t border-zinc-800">
+        <div class="max-w-3xl mx-auto px-6 py-16 text-center">
+            <h2 class="text-4xl font-display tracking-tighter mb-4">Tu veux ton propre site ?</h2>
+            <p class="text-zinc-400 text-lg max-w-md mx-auto">Dis-moi ce que tu veux (portfolio, landing page, blog, boutique...) et je te le construis en quelques minutes avec GitHub + Vercel.</p>
+            
+            <div class="mt-8">
+                <button onclick="contactMe()" 
+                        class="px-10 py-4 bg-white text-zinc-950 font-semibold rounded-3xl text-lg hover:bg-zinc-100 transition-all shadow-xl">
+                    Demander mon site personnalisé
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-zinc-800 py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-y-6 text-sm">
+                <div class="flex items-center gap-x-2 text-zinc-400">
+                    <div class="w-6 h-6 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl flex items-center justify-center">
+                        <span class="text-[10px] font-bold text-white">G</span>
+                    </div>
+                    <span>Créé avec <span class="text-white font-medium">Grok</span> • 2026</span>
+                </div>
+                
+                <div class="flex items-center gap-x-6 text-zinc-400">
+                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                    <a href="#" onclick="window.location.reload()" class="hover:text-white transition-colors">Recharger</a>
+                    <span class="text-zinc-700">•</span>
+                    <span class="text-xs">100% open source</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+        }
+
+        // Mobile menu
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileBtn.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+        }
+
+        // Smooth scroll for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const icon = mobileBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                }
+            });
+        });
+
+        // Theme changer
+        let currentThemeMode = 'dark';
+        
+        function changeTheme() {
+            const body = document.body;
+            const themeLabel = document.getElementById('current-theme');
+            
+            if (currentThemeMode === 'dark') {
+                // Switch to light
+                body.style.backgroundColor = '#f8fafc';
+                body.style.color = '#0f172a';
+                
+                // Update some elements
+                document.querySelectorAll('.bg-zinc-950').forEach(el => el.style.backgroundColor = '#ffffff');
+                document.querySelectorAll('.bg-zinc-900').forEach(el => el.style.backgroundColor = '#f1e7ff20');
+                document.querySelectorAll('.border-zinc-800').forEach(el => el.style.borderColor = '#e2e8f0');
+                
+                if (themeLabel) themeLabel.textContent = 'Clair (modifié)';
+                if (themeLabel) themeLabel.style.color = '#6366f1';
+                currentThemeMode = 'light';
+            } else {
+                // Back to dark
+                location.reload(); // Simple way to reset for demo
+            }
+        }
+
+        // Simulate AI modifying the site
+        function simulateAIResponse() {
+            const btns = document.querySelectorAll('#demo button, #demo .cursor-pointer');
+            
+            const originalTexts = [];
+            btns.forEach((btn, i) => {
+                originalTexts[i] = btn.innerHTML;
+                btn.style.transition = 'all 0.3s ease';
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> L'IA réfléchit...`;
+                btn.disabled = true;
+            });
+
+            setTimeout(() => {
+                btns.forEach((btn, i) => {
+                    btn.innerHTML = originalTexts[i];
+                    btn.disabled = false;
+                });
+                
+                // Fun effect: add a success banner
+                const banner = document.createElement('div');
+                banner.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-6 py-3 rounded-3xl flex items-center gap-x-3 text-sm shadow-2xl z-[999]`;
+                banner.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    <span>L'IA a ajouté une nouvelle section ! (simulation)</span>
+                `;
+                document.body.appendChild(banner);
+                
+                setTimeout(() => {
+                    banner.style.transition = 'all 0.4s ease';
+                    banner.style.opacity = '0';
+                    setTimeout(() => banner.remove(), 300);
+                }, 2800);
+            }, 1650);
+        }
+
+        // Deploy to Vercel function
+        function deployToVercel() {
+            const url = 'https://vercel.com/new/git?repository-url=https%3A%2F%2Fgithub.com%2Fadriengeyer02-bot%2Fdemo-site-grok-vercel';
+            window.open(url, '_blank');
+        }
+
+        // Contact me simulation
+        function contactMe() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[999] p-6';
+            modal.innerHTML = `
+                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="font-semibold text-2xl tracking-tight">Parlons de ton projet</div>
+                            <div class="text-zinc-400 text-sm mt-1">Je peux créer n'importe quel site pour toi.</div>
+                        </div>
+                        <button onclick="this.closest('.fixed').remove()" class="text-zinc-400 hover:text-white text-2xl leading-none">&times;</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-zinc-400 block mb-1.5">Ton nom</label>
+                            <input type="text" value="Utilisateur Grok" class="w-full bg-zinc-950 border border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-zinc-400 block mb-1.5">Type de site souhaité</label>
+                            <input type="text" placeholder="Portfolio, Landing page, Blog..." class="w-full bg-zinc-950 border border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-zinc-400 block mb-1.5">Description rapide</label>
+                            <textarea class="w-full bg-zinc-950 border border-zinc-700 rounded-3xl px-4 py-3 text-sm h-24 focus:outline-none focus:border-indigo-500" placeholder="Je voudrais un site pour mon entreprise de..."></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="submitContactForm(this)" 
+                            class="mt-6 w-full py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-3xl flex items-center justify-center gap-x-2">
+                        <span>Envoyer ma demande à Grok</span>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function submitContactForm(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...`;
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.closest('.fixed').remove();
+                
+                const toast = document.createElement('div');
+                toast.className = `fixed bottom-6 right-6 bg-zinc-900 border border-emerald-500/30 text-emerald-400 px-6 py-4 rounded-3xl flex items-center gap-x-3 shadow-2xl z-[999]`;
+                toast.innerHTML = `
+                    <i class="fas fa-check-circle text-emerald-400"></i>
+                    <div>
+                        <div class="font-medium text-white">Demande reçue !</div>
+                        <div class="text-xs text-emerald-300/70">Grok va te répondre très bientôt.</div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.transition = 'all .4s ease';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.parentNode.removeChild(toast), 300);
+                }, 4200);
+            }, 1350);
+        }
+
+        // Keyboard shortcut hint
+        function addKeyboardHint() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    const demoSection = document.getElementById('demo');
+                    if (demoSection) demoSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // Easter egg: press 'g' for grok
+            let keys = '';
+            document.addEventListener('keypress', function(e) {
+                keys += e.key;
+                if (keys.length > 5) keys = keys.slice(-5);
+                if (keys.toLowerCase() === 'grok!') {
+                    keys = '';
+                    const hero = document.getElementById('accueil');
+                    if (hero) {
+                        hero.style.transition = 'all 0.6s cubic-bezier(0.23, 1.0, 0.32, 1)';
+                        hero.style.transform = 'scale(0.96)';
+                        setTimeout(() => {
+                            hero.style.transform = 'scale(1)';
+                        }, 600);
+                    }
+                }
+            });
+        }
+
+        // Initialize everything
+        function init() {
+            initializeTailwind();
+            addKeyboardHint();
+            
+            // Random nice touch: animate stats on scroll into view
+            const statsSection = document.querySelector('.border-b.border-zinc-800');
+            if (statsSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            animateStats();
+                            observer.disconnect();
+                        }
+                    });
+                });
+                observer.observe(statsSection);
+            }
+
+            // Console message for devs
+            console.log('%c[Gro kWeb] Site créé par Grok via GitHub + Vercel tools. Tu peux modifier ce code directement sur GitHub !', 'color:#64748b; font-size: 9px');
+        }
+
+        function animateStats() {
+            const numbers = document.querySelectorAll('.stat-number');
+            numbers.forEach(num => {
+                const target = num.textContent;
+                if (target.includes('<')) return;
+                
+                const finalValue = parseFloat(target);
+                let current = 0;
+                const duration = 1400;
+                const startTime = Date.now();
+
+                const timer = setInterval(() => {
+                    const progress = Math.min((Date.now() - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    
+                    if (target === '98') {
+                        current = Math.floor(eased * finalValue);
+                        num.textContent = current;
+                    } else if (target === '4.9') {
+                        current = (eased * finalValue).toFixed(1);
+                        num.textContent = current;
+                    }
+                    
+                    if (progress === 1) clearInterval(timer);
+                }, 40);
+            });
+        }
+
+        // Boot the app
+        window.onload = init;
+    </script>
+</body>
+</html>
