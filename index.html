@@ -10,75 +10,21 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
         
-        body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
-        
-        .font-display {
-            font-family: 'Space Grotesk', 'Inter', sans-serif;
-            font-weight: 600;
-        }
-
-        .nav-link {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            color: #6366f1;
-        }
-
-        .dashboard-card {
-            transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                       box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .metric-value {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .correlation-cell {
-            transition: all 0.1s ease;
-            cursor: pointer;
-        }
-        
-        .correlation-cell:hover {
-            transform: scale(1.05);
-            z-index: 10;
-            position: relative;
-        }
-
-        .asset-pill {
-            transition: all 0.2s ease;
-        }
-        
-        .asset-pill.active {
-            background-color: #6366f1;
-            color: white;
-            border-color: #6366f1;
-        }
-
-        .macro-value {
-            font-size: 1.35rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .scenario-card {
-            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        
-        .scenario-card.active {
-            border-color: #6366f1;
-            background-color: #1e2937;
-        }
-
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; }
+        .nav-link { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-link:hover, .nav-link.active { color: #6366f1; }
+        .dashboard-card { transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1); }
+        .dashboard-card:hover { transform: translateY(-2px); }
+        .correlation-cell { transition: all 0.1s ease; cursor: pointer; }
+        .correlation-cell:hover { transform: scale(1.05); z-index: 10; position: relative; }
+        .asset-pill { transition: all 0.2s ease; }
+        .asset-pill.active { background-color: #6366f1; color: white; border-color: #6366f1; }
+        .macro-value { font-size: 1.35rem; font-weight: 700; line-height: 1; }
+        .scenario-card { transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1); }
+        .scenario-card.active { border-color: #6366f1; background-color: #1e2937; }
         .impact-positive { color: #4ade80; }
         .impact-negative { color: #f87171; }
-        .impact-neutral { color: #94a3b8; }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200">
@@ -106,7 +52,7 @@
                 <div class="hidden md:flex items-center gap-x-3">
                     <div class="flex items-center gap-x-2 text-xs bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1">
                         <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                        <span class="text-emerald-400 font-medium">Données mises à jour il y a 6 min</span>
+                        <span class="text-emerald-400 font-medium">Données mises à jour il y a 4 min</span>
                     </div>
                     <button onclick="refreshData()" class="flex items-center gap-x-2 px-4 py-2 text-sm font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl transition-colors">
                         <i class="fas fa-sync-alt text-xs"></i>
@@ -140,8 +86,8 @@
                 <div class="flex items-center gap-x-3 mb-2">
                     <span class="px-3 py-1 text-xs font-medium tracking-widest bg-indigo-950 text-indigo-400 rounded-full">10 ACTIFS • OUTIL SCÉNARIOS</span>
                 </div>
-                <h1 class="font-display text-5xl tracking-tighter">Macro Interconnection Dashboard</h1>
-                <p class="text-xl text-zinc-400 mt-2 max-w-lg">Visualisez les liens fondamentaux et simulez l'impact des événements macro.</p>
+                <h1 class="font-display text-5xl tracking-tighter">MacroLink</h1>
+                <p class="text-xl text-zinc-400 mt-2 max-w-lg">Visualisez les interconnexions macro et simulez l'impact des événements sur les marchés.</p>
             </div>
             
             <div class="flex items-center gap-x-4">
@@ -160,76 +106,27 @@
     <div id="overview" class="max-w-7xl mx-auto px-6 pb-8">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">Fed Funds Rate</div>
-                        <div class="macro-value mt-1 text-white">4.25-4.50%</div>
-                    </div>
-                    <i class="fas fa-university text-indigo-400 text-xl mt-1"></i>
-                </div>
-                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
-                    <i class="fas fa-arrow-down"></i> <span>-25 bps depuis déc. 2025</span>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">Fed Funds Rate</div><div class="macro-value mt-1 text-white">4.25-4.50%</div></div><i class="fas fa-university text-indigo-400 text-xl mt-1"></i></div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1"><i class="fas fa-arrow-down"></i> <span>-25 bps depuis déc. 2025</span></div>
             </div>
-
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">US CPI (YoY)</div>
-                        <div class="macro-value mt-1 text-white">2.7%</div>
-                    </div>
-                    <i class="fas fa-globe text-violet-400 text-xl mt-1"></i>
-                </div>
-                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
-                    <i class="fas fa-check"></i> <span>Proche de la cible</span>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">US CPI (YoY)</div><div class="macro-value mt-1 text-white">2.7%</div></div><i class="fas fa-globe text-violet-400 text-xl mt-1"></i></div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1"><i class="fas fa-check"></i> <span>Proche de la cible</span></div>
             </div>
-
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">DXY</div>
-                        <div class="macro-value mt-1 text-white">103.85</div>
-                    </div>
-                    <i class="fas fa-dollar-sign text-amber-400 text-xl mt-1"></i>
-                </div>
-                <div class="text-rose-400 text-xs mt-3 flex items-center gap-x-1">
-                    <i class="fas fa-arrow-down"></i> <span>-1.8% ce mois</span>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">DXY</div><div class="macro-value mt-1 text-white">103.85</div></div><i class="fas fa-dollar-sign text-amber-400 text-xl mt-1"></i></div>
+                <div class="text-rose-400 text-xs mt-3 flex items-center gap-x-1"><i class="fas fa-arrow-down"></i> <span>-1.8% ce mois</span></div>
             </div>
-
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">VIX</div>
-                        <div class="macro-value mt-1 text-white">18.4</div>
-                    </div>
-                    <i class="fas fa-chart-area text-emerald-400 text-xl mt-1"></i>
-                </div>
-                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
-                    <i class="fas fa-check"></i> <span>Faible volatilité</span>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">VIX</div><div class="macro-value mt-1 text-white">18.4</div></div><i class="fas fa-chart-area text-emerald-400 text-xl mt-1"></i></div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1"><i class="fas fa-check"></i> <span>Faible volatilité</span></div>
             </div>
-
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">10Y Treasury</div>
-                        <div class="macro-value mt-1 text-white">4.12%</div>
-                    </div>
-                    <i class="fas fa-percent text-sky-400 text-xl mt-1"></i>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">10Y Treasury</div><div class="macro-value mt-1 text-white">4.12%</div></div><i class="fas fa-percent text-sky-400 text-xl mt-1"></i></div>
                 <div class="text-zinc-400 text-xs mt-3">Courbe plate</div>
             </div>
-
             <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-xs text-zinc-400">2Y-10Y Spread</div>
-                        <div class="macro-value mt-1 text-white">+12 bps</div>
-                    </div>
-                    <i class="fas fa-chart-line text-emerald-400 text-xl mt-1"></i>
-                </div>
+                <div class="flex justify-between items-start"><div><div class="text-xs text-zinc-400">2Y-10Y Spread</div><div class="macro-value mt-1 text-white">+12 bps</div></div><i class="fas fa-chart-line text-emerald-400 text-xl mt-1"></i></div>
                 <div class="text-emerald-400 text-xs mt-3">Légèrement positive</div>
             </div>
         </div>
@@ -237,161 +134,78 @@
 
     <!-- Assets -->
     <div class="max-w-7xl mx-auto px-6 pb-8">
-        <div class="flex items-center justify-between mb-5">
-            <h2 class="font-semibold text-xl tracking-tight">Actifs prioritaires (10)</h2>
-            <span class="text-xs px-3 py-1 bg-zinc-900 rounded-2xl text-zinc-400">Les plus tradés</span>
-        </div>
-
+        <div class="flex items-center justify-between mb-5"><h2 class="font-semibold text-xl tracking-tight">Actifs prioritaires (10)</h2><span class="text-xs px-3 py-1 bg-zinc-900 rounded-2xl text-zinc-400">Les plus tradés mondialement</span></div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-3">
-            <div onclick="selectAsset(this, 'EURUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">EUR/USD</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.42%</span><br><span class="text-[10px] text-zinc-500">1.0850</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'USDJPY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">USD/JPY</span></div>
-                <div class="text-right text-xs"><span class="text-rose-400">-0.31%</span><br><span class="text-[10px] text-zinc-500">148.65</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'GBPUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">GBP/USD</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.28%</span><br><span class="text-[10px] text-zinc-500">1.272</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'AUDUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">AUD/USD</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.55%</span><br><span class="text-[10px] text-zinc-500">0.632</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'USDCAD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">USD/CAD</span></div>
-                <div class="text-right text-xs"><span class="text-rose-400">-0.19%</span><br><span class="text-[10px] text-zinc-500">1.378</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'XAUUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">Gold</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+1.12%</span><br><span class="text-[10px] text-zinc-500">2,685</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'XAGUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">Silver</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.87%</span><br><span class="text-[10px] text-zinc-500">31.45</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'SPX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">S&P 500</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.65%</span><br><span class="text-[10px] text-zinc-500">5,980</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'NDX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">Nasdaq</span></div>
-                <div class="text-right text-xs"><span class="text-emerald-400">+0.91%</span><br><span class="text-[10px] text-zinc-500">19,450</span></div>
-            </div>
-            <div onclick="selectAsset(this, 'DXY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
-                <div><span class="font-mono font-semibold">DXY</span></div>
-                <div class="text-right text-xs"><span class="text-rose-400">-0.55%</span><br><span class="text-[10px] text-zinc-500">103.85</span></div>
-            </div>
+            <div onclick="selectAsset(this, 'EURUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">EUR/USD</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.42%</span><br><span class="text-[10px] text-zinc-500">1.0850</span></div></div>
+            <div onclick="selectAsset(this, 'USDJPY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">USD/JPY</span></div><div class="text-right text-xs"><span class="text-rose-400">-0.31%</span><br><span class="text-[10px] text-zinc-500">148.65</span></div></div>
+            <div onclick="selectAsset(this, 'GBPUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">GBP/USD</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.28%</span><br><span class="text-[10px] text-zinc-500">1.272</span></div></div>
+            <div onclick="selectAsset(this, 'AUDUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">AUD/USD</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.55%</span><br><span class="text-[10px] text-zinc-500">0.632</span></div></div>
+            <div onclick="selectAsset(this, 'USDCAD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">USD/CAD</span></div><div class="text-right text-xs"><span class="text-rose-400">-0.19%</span><br><span class="text-[10px] text-zinc-500">1.378</span></div></div>
+            <div onclick="selectAsset(this, 'XAUUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">Gold</span></div><div class="text-right text-xs"><span class="text-emerald-400">+1.12%</span><br><span class="text-[10px] text-zinc-500">2,685</span></div></div>
+            <div onclick="selectAsset(this, 'XAGUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">Silver</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.87%</span><br><span class="text-[10px] text-zinc-500">31.45</span></div></div>
+            <div onclick="selectAsset(this, 'SPX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">S&P 500</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.65%</span><br><span class="text-[10px] text-zinc-500">5,980</span></div></div>
+            <div onclick="selectAsset(this, 'NDX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">Nasdaq</span></div><div class="text-right text-xs"><span class="text-emerald-400">+0.91%</span><br><span class="text-[10px] text-zinc-500">19,450</span></div></div>
+            <div onclick="selectAsset(this, 'DXY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]"><div><span class="font-mono font-semibold">DXY</span></div><div class="text-right text-xs"><span class="text-rose-400">-0.55%</span><br><span class="text-[10px] text-zinc-500">103.85</span></div></div>
         </div>
     </div>
 
     <!-- Correlations -->
     <div id="correlations" class="max-w-7xl mx-auto px-6 pb-8">
-        <div class="flex items-end justify-between mb-5">
-            <div>
-                <h2 class="font-semibold text-xl tracking-tight">Matrice de corrélations (10 actifs)</h2>
-                <p class="text-sm text-zinc-400">Corrélations de rendements quotidiens • 12 mois (illustratives)</p>
-            </div>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 overflow-x-auto">
-            <table class="w-full min-w-[820px] text-sm">
-                <thead>
-                    <tr class="text-zinc-400 text-xs">
-                        <th class="text-left w-24">Actif</th>
-                        <th>EUR/USD</th><th>USD/JPY</th><th>GBP/USD</th><th>AUD/USD</th><th>USD/CAD</th>
-                        <th>Gold</th><th>Silver</th><th>S&P 500</th><th>Nasdaq</th><th>DXY</th>
-                    </tr>
-                </thead>
-                <tbody id="correlation-table"></tbody>
-            </table>
-        </div>
-        <div class="mt-2 text-[10px] text-zinc-500 px-1">Clique sur une cellule pour une explication pointue des liens macro.</div>
+        <div class="flex items-end justify-between mb-5"><div><h2 class="font-semibold text-xl tracking-tight">Matrice de corrélations (10 actifs)</h2><p class="text-sm text-zinc-400">Corrélations de rendements quotidiens • 12 mois (illustratives)</p></div></div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 overflow-x-auto"><table class="w-full min-w-[820px] text-sm"><thead><tr class="text-zinc-400 text-xs"><th class="text-left w-24">Actif</th><th>EUR/USD</th><th>USD/JPY</th><th>GBP/USD</th><th>AUD/USD</th><th>USD/CAD</th><th>Gold</th><th>Silver</th><th>S&P 500</th><th>Nasdaq</th><th>DXY</th></tr></thead><tbody id="correlation-table"></tbody></table></div>
+        <div class="mt-2 text-[10px] text-zinc-500 px-1">Clique sur une cellule pour une explication pointue des mécanismes macro.</div>
     </div>
 
-    <!-- Correlation Trend Chart -->
-    <div class="max-w-7xl mx-auto px-6 pb-10">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-            <h3 class="font-semibold mb-4">Évolution corrélation DXY vs Gold (rolling 3 mois)</h3>
-            <div class="h-44"><canvas id="correlationTrendChart"></canvas></div>
-        </div>
-    </div>
+    <!-- Trend Chart -->
+    <div class="max-w-7xl mx-auto px-6 pb-10"><div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6"><h3 class="font-semibold mb-4">Évolution de la corrélation DXY vs Gold (rolling 3 mois)</h3><div class="h-44"><canvas id="correlationTrendChart"></canvas></div></div></div>
 
-    <!-- NEW: Macro Scenarios Tool -->
+    <!-- Scenarios Tool (enriched) -->
     <div id="scenarios" class="max-w-7xl mx-auto px-6 pb-14">
-        <div class="mb-6">
-            <h2 class="font-semibold text-2xl tracking-tight">Outil Scénarios Macro • Impact sur les interconnexions</h2>
-            <p class="text-zinc-400 mt-1">Sélectionne un événement macro pour voir son impact attendu sur les 10 actifs et les corrélations.</p>
-        </div>
+        <div class="mb-6"><h2 class="font-semibold text-2xl tracking-tight">Outil Scénarios Macro</h2><p class="text-zinc-400 mt-1">Simule l'impact d'événements macro sur les 10 actifs et les interconnexions.</p></div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" id="scenario-buttons">
-            <!-- Populated by JS -->
-        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8" id="scenario-buttons"></div>
 
         <div id="scenario-result" class="hidden bg-zinc-900 border border-zinc-700 rounded-3xl p-7">
             <div class="flex justify-between items-start mb-5">
-                <div>
-                    <div id="scenario-title" class="font-semibold text-2xl tracking-tight"></div>
-                    <div id="scenario-subtitle" class="text-emerald-400 text-sm mt-1"></div>
-                </div>
+                <div><div id="scenario-title" class="font-semibold text-2xl tracking-tight"></div><div id="scenario-subtitle" class="text-emerald-400 text-sm mt-1"></div></div>
                 <button onclick="clearScenario()" class="text-zinc-400 hover:text-white text-xl">&times;</button>
             </div>
-
-            <div class="mb-6">
-                <div class="text-sm font-medium text-zinc-400 mb-2">Explication pointue</div>
-                <div id="scenario-explanation" class="text-zinc-200 leading-relaxed text-[15px]"></div>
-            </div>
-
-            <div>
-                <div class="text-sm font-medium text-zinc-400 mb-3">Impact attendu sur les actifs</div>
-                <div id="scenario-impacts" class="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm"></div>
-            </div>
-
-            <div class="mt-6 pt-5 border-t border-zinc-700 text-xs text-zinc-500">
-                Ces impacts sont basés sur des régimes historiques et des mécanismes macroéconomiques classiques. Les corrélations peuvent temporairement se modifier pendant l'événement.
-            </div>
+            <div class="mb-6"><div class="text-sm font-medium text-zinc-400 mb-2">Explication macro pointue</div><div id="scenario-explanation" class="text-zinc-200 leading-relaxed text-[15px]"></div></div>
+            <div><div class="text-sm font-medium text-zinc-400 mb-3">Impact attendu sur les actifs</div><div id="scenario-impacts" class="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm"></div></div>
+            <div class="mt-6 pt-5 border-t border-zinc-700 text-xs text-zinc-500">Ces impacts sont basés sur des régimes historiques. Les corrélations peuvent temporairement évoluer pendant l'événement.</div>
         </div>
     </div>
 
     <!-- Macro Drivers -->
-    <div id="drivers" class="max-w-7xl mx-auto px-6 pb-10">
-        <h2 class="font-semibold text-xl tracking-tight mb-5">Drivers macro clés</h2>
-        <div class="grid md:grid-cols-3 gap-5">
-            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                <div class="flex gap-x-4">
-                    <div class="w-11 h-11 flex-shrink-0 bg-indigo-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-university text-indigo-400 text-2xl"></i></div>
-                    <div><div class="font-semibold">Politique monétaire Fed</div><div class="text-sm text-zinc-400 mt-1.5">Baisses de taux → actifs risqués ↑, dollar ↓, or ↑</div></div>
-                </div>
-            </div>
-            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                <div class="flex gap-x-4">
-                    <div class="w-11 h-11 flex-shrink-0 bg-amber-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-globe text-amber-400 text-2xl"></i></div>
-                    <div><div class="font-semibold">Inflation US</div><div class="text-sm text-zinc-400 mt-1.5">Inflation ↑ → dollar ↑, or ↓, rendements ↑</div></div>
-                </div>
-            </div>
-            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-                <div class="flex gap-x-4">
-                    <div class="w-11 h-11 flex-shrink-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-industry text-emerald-400 text-2xl"></i></div>
-                    <div><div class="font-semibold">Croissance Chine</div><div class="text-sm text-zinc-400 mt-1.5">Données Chine ↑ → AUD ↑, matières premières ↑, actions cycliques ↑</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="max-w-7xl mx-auto px-6 pb-10"><h2 class="font-semibold text-xl tracking-tight mb-5">Drivers macro clés</h2><div class="grid md:grid-cols-3 gap-5"><div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6"><div class="flex gap-x-4"><div class="w-11 h-11 flex-shrink-0 bg-indigo-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-university text-indigo-400 text-2xl"></i></div><div><div class="font-semibold">Politique monétaire Fed</div><div class="text-sm text-zinc-400 mt-1.5">Baisses de taux → actifs risqués ↑, dollar ↓, or ↑</div></div></div></div><div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6"><div class="flex gap-x-4"><div class="w-11 h-11 flex-shrink-0 bg-amber-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-globe text-amber-400 text-2xl"></i></div><div><div class="font-semibold">Inflation US</div><div class="text-sm text-zinc-400 mt-1.5">Inflation ↑ → dollar ↑, or ↓, rendements ↑</div></div></div></div><div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6"><div class="flex gap-x-4"><div class="w-11 h-11 flex-shrink-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center"><i class="fas fa-industry text-emerald-400 text-2xl"></i></div><div><div class="font-semibold">Croissance Chine</div><div class="text-sm text-zinc-400 mt-1.5">Données Chine ↑ → AUD ↑, matières premières ↑, actions cycliques ↑</div></div></div></div></div></div>
 
     <!-- AI Insights -->
-    <div id="insights" class="max-w-7xl mx-auto px-6 pb-16">
-        <div class="mb-6">
-            <h2 class="font-semibold text-xl tracking-tight">AI Insights — Analyses pointues des interconnexions</h2>
-        </div>
+    <div id="insights" class="max-w-7xl mx-auto px-6 pb-14"><div class="mb-6"><h2 class="font-semibold text-xl tracking-tight">AI Insights — Analyses pointues</h2></div><div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8"><div class="flex flex-wrap gap-2 mb-6" id="insight-buttons"></div><div id="insight-content" class="prose prose-invert max-w-none text-zinc-200 leading-relaxed"></div><div class="mt-6 pt-6 border-t border-zinc-700 flex justify-between text-xs"><div class="text-zinc-500 flex items-center gap-x-2"><i class="fas fa-robot"></i> <span>Analyses éducatives basées sur régimes historiques</span></div><button onclick="regenerateInsight()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-xs font-medium flex items-center gap-x-2"><i class="fas fa-sync-alt"></i> <span>Régénérer</span></button></div></div></div>
 
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-            <div class="flex flex-wrap gap-2 mb-6" id="insight-buttons"></div>
-            <div id="insight-content" class="prose prose-invert max-w-none text-zinc-200 leading-relaxed"></div>
-
-            <div class="mt-6 pt-6 border-t border-zinc-700 flex justify-between text-xs">
-                <div class="text-zinc-500 flex items-center gap-x-2"><i class="fas fa-robot"></i> <span>Analyses éducatives basées sur régimes historiques</span></div>
-                <button onclick="regenerateInsight()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-xs font-medium flex items-center gap-x-2"><i class="fas fa-sync-alt"></i> <span>Régénérer</span></button>
+    <!-- Partner / Broker Section (Clean Ad) -->
+    <div class="max-w-7xl mx-auto px-6 pb-14">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8">
+            <div class="flex-1">
+                <div class="flex items-center gap-x-3 mb-3">
+                    <div class="px-3 py-1 bg-emerald-900/30 text-emerald-400 text-xs font-medium rounded-2xl">PARTENAIRE RECOMMANDÉ</div>
+                </div>
+                <h3 class="text-2xl font-semibold tracking-tight mb-2">Tradez les actifs macro avec Vantage</h3>
+                <p class="text-zinc-400 max-w-md">Spreads compétitifs sur les paires forex majeures, l'or, l'argent, les indices et le DXY. Exécution rapide et conditions adaptées au trading macro.</p>
+                <div class="mt-5">
+                    <a href="https://www.vantagemarkets.com/open-live-account?cpaAffid=MjAyNDQwMDM" target="_blank" 
+                       class="inline-flex items-center gap-x-3 px-7 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl hover:bg-zinc-100 transition-all text-sm">
+                        <span>Ouvrir un compte live</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="text-[10px] text-zinc-500 mt-3">* Trading comporte des risques de perte en capital. Vantage Markets est régulé.</div>
+            </div>
+            <div class="hidden md:block w-px h-20 bg-zinc-700"></div>
+            <div class="text-sm text-zinc-400 max-w-xs">
+                Avantages pour les traders macro :<br>
+                • Spreads serrés sur EUR/USD, USD/JPY, Gold<br>
+                • Accès aux indices US et matières premières<br>
+                • Outils d'analyse avancés inclus
             </div>
         </div>
     </div>
@@ -408,26 +222,10 @@
             const btn = document.getElementById('mobile-menu-btn');
             const menu = document.getElementById('mobile-menu');
             if (!btn || !menu) return;
-            btn.addEventListener('click', () => {
-                menu.classList.toggle('hidden');
-                const icon = btn.querySelector('i');
-                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
-            });
+            btn.addEventListener('click', () => { menu.classList.toggle('hidden'); const icon = btn.querySelector('i'); if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); } });
         }
 
-        const correlationData = {
-            'EURUSD': { 'EURUSD': 1.00, 'USDJPY': -0.72, 'GBPUSD': 0.68, 'AUDUSD': 0.52, 'USDCAD': -0.61, 'XAUUSD': 0.45, 'XAGUSD': 0.38, 'SPX': 0.28, 'NDX': 0.31, 'DXY': -0.89 },
-            'USDJPY': { 'EURUSD': -0.72, 'USDJPY': 1.00, 'GBPUSD': -0.55, 'AUDUSD': -0.48, 'USDCAD': 0.59, 'XAUUSD': -0.51, 'XAGUSD': -0.42, 'SPX': -0.19, 'NDX': -0.22, 'DXY': 0.81 },
-            'GBPUSD': { 'EURUSD': 0.68, 'USDJPY': -0.55, 'GBPUSD': 1.00, 'AUDUSD': 0.61, 'USDCAD': -0.52, 'XAUUSD': 0.39, 'XAGUSD': 0.34, 'SPX': 0.25, 'NDX': 0.27, 'DXY': -0.78 },
-            'AUDUSD': { 'EURUSD': 0.52, 'USDJPY': -0.48, 'GBPUSD': 0.61, 'AUDUSD': 1.00, 'USDCAD': -0.71, 'XAUUSD': 0.48, 'XAGUSD': 0.55, 'SPX': 0.22, 'NDX': 0.19, 'DXY': -0.65 },
-            'USDCAD': { 'EURUSD': -0.61, 'USDJPY': 0.59, 'GBPUSD': -0.52, 'AUDUSD': -0.71, 'USDCAD': 1.00, 'XAUUSD': -0.44, 'XAGUSD': -0.39, 'SPX': -0.15, 'NDX': -0.18, 'DXY': 0.74 },
-            'XAUUSD': { 'EURUSD': 0.45, 'USDJPY': -0.51, 'GBPUSD': 0.39, 'AUDUSD': 0.48, 'USDCAD': -0.44, 'XAUUSD': 1.00, 'XAGUSD': 0.82, 'SPX': 0.12, 'NDX': 0.09, 'DXY': -0.67 },
-            'XAGUSD': { 'EURUSD': 0.38, 'USDJPY': -0.42, 'GBPUSD': 0.34, 'AUDUSD': 0.55, 'USDCAD': -0.39, 'XAUUSD': 0.82, 'XAGUSD': 1.00, 'SPX': 0.08, 'NDX': 0.05, 'DXY': -0.58 },
-            'SPX': { 'EURUSD': 0.28, 'USDJPY': -0.19, 'GBPUSD': 0.25, 'AUDUSD': 0.22, 'USDCAD': -0.15, 'XAUUSD': 0.12, 'XAGUSD': 0.08, 'SPX': 1.00, 'NDX': 0.94, 'DXY': -0.31 },
-            'NDX': { 'EURUSD': 0.31, 'USDJPY': -0.22, 'GBPUSD': 0.27, 'AUDUSD': 0.19, 'USDCAD': -0.18, 'XAUUSD': 0.09, 'XAGUSD': 0.05, 'SPX': 0.94, 'NDX': 1.00, 'DXY': -0.35 },
-            'DXY': { 'EURUSD': -0.89, 'USDJPY': 0.81, 'GBPUSD': -0.78, 'AUDUSD': -0.65, 'USDCAD': 0.74, 'XAUUSD': -0.67, 'XAGUSD': -0.58, 'SPX': -0.31, 'NDX': -0.35, 'DXY': 1.00 }
-        };
-
+        const correlationData = { 'EURUSD': { 'EURUSD': 1.00, 'USDJPY': -0.72, 'GBPUSD': 0.68, 'AUDUSD': 0.52, 'USDCAD': -0.61, 'XAUUSD': 0.45, 'XAGUSD': 0.38, 'SPX': 0.28, 'NDX': 0.31, 'DXY': -0.89 }, 'USDJPY': { 'EURUSD': -0.72, 'USDJPY': 1.00, 'GBPUSD': -0.55, 'AUDUSD': -0.48, 'USDCAD': 0.59, 'XAUUSD': -0.51, 'XAGUSD': -0.42, 'SPX': -0.19, 'NDX': -0.22, 'DXY': 0.81 }, 'GBPUSD': { 'EURUSD': 0.68, 'USDJPY': -0.55, 'GBPUSD': 1.00, 'AUDUSD': 0.61, 'USDCAD': -0.52, 'XAUUSD': 0.39, 'XAGUSD': 0.34, 'SPX': 0.25, 'NDX': 0.27, 'DXY': -0.78 }, 'AUDUSD': { 'EURUSD': 0.52, 'USDJPY': -0.48, 'GBPUSD': 0.61, 'AUDUSD': 1.00, 'USDCAD': -0.71, 'XAUUSD': 0.48, 'XAGUSD': 0.55, 'SPX': 0.22, 'NDX': 0.19, 'DXY': -0.65 }, 'USDCAD': { 'EURUSD': -0.61, 'USDJPY': 0.59, 'GBPUSD': -0.52, 'AUDUSD': -0.71, 'USDCAD': 1.00, 'XAUUSD': -0.44, 'XAGUSD': -0.39, 'SPX': -0.15, 'NDX': -0.18, 'DXY': 0.74 }, 'XAUUSD': { 'EURUSD': 0.45, 'USDJPY': -0.51, 'GBPUSD': 0.39, 'AUDUSD': 0.48, 'USDCAD': -0.44, 'XAUUSD': 1.00, 'XAGUSD': 0.82, 'SPX': 0.12, 'NDX': 0.09, 'DXY': -0.67 }, 'XAGUSD': { 'EURUSD': 0.38, 'USDJPY': -0.42, 'GBPUSD': 0.34, 'AUDUSD': 0.55, 'USDCAD': -0.39, 'XAUUSD': 0.82, 'XAGUSD': 1.00, 'SPX': 0.08, 'NDX': 0.05, 'DXY': -0.58 }, 'SPX': { 'EURUSD': 0.28, 'USDJPY': -0.19, 'GBPUSD': 0.25, 'AUDUSD': 0.22, 'USDCAD': -0.15, 'XAUUSD': 0.12, 'XAGUSD': 0.08, 'SPX': 1.00, 'NDX': 0.94, 'DXY': -0.31 }, 'NDX': { 'EURUSD': 0.31, 'USDJPY': -0.22, 'GBPUSD': 0.27, 'AUDUSD': 0.19, 'USDCAD': -0.18, 'XAUUSD': 0.09, 'XAGUSD': 0.05, 'SPX': 0.94, 'NDX': 1.00, 'DXY': -0.35 }, 'DXY': { 'EURUSD': -0.89, 'USDJPY': 0.81, 'GBPUSD': -0.78, 'AUDUSD': -0.65, 'USDCAD': 0.74, 'XAUUSD': -0.67, 'XAGUSD': -0.58, 'SPX': -0.31, 'NDX': -0.35, 'DXY': 1.00 } };
         const assetNames = { 'EURUSD': 'EUR/USD', 'USDJPY': 'USD/JPY', 'GBPUSD': 'GBP/USD', 'AUDUSD': 'AUD/USD', 'USDCAD': 'USD/CAD', 'XAUUSD': 'Gold', 'XAGUSD': 'Silver', 'SPX': 'S&P 500', 'NDX': 'Nasdaq', 'DXY': 'DXY' };
 
         function renderCorrelationTable() {
@@ -457,84 +255,28 @@
         function showCorrelationDetail(a1, a2, val) {
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-6';
-            let interp = '';
-            if (val > 0.65) interp = 'Forte corrélation positive : les deux actifs bougent fortement ensemble. Mécanisme classique : flux de risque ou affaiblissement du dollar.';
-            else if (val > 0.4) interp = 'Corrélation positive notable. Souvent due à des facteurs de risque commun ou à des flux de capitaux similaires.';
-            else if (val > 0) interp = 'Corrélation positive modérée. Les liens existent mais sont influencés par d\'autres variables macro.';
-            else if (val > -0.4) interp = 'Corrélation négative modérée. Les actifs réagissent de façon opposée à certains chocs macro.';
-            else if (val > -0.65) interp = 'Corrélation négative notable. Typique des relations safe-haven vs risque (ex: dollar vs or).';
-            else interp = 'Forte corrélation négative : les deux actifs bougent fortement en sens inverse. Mécanisme puissant de substitution ou de flux opposés.';
-
-            modal.innerHTML = `
-                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-lg w-full p-7">
-                    <div class="flex justify-between mb-4">
-                        <div><span class="font-semibold text-xl">${assetNames[a1]} vs ${assetNames[a2]}</span><div class="text-5xl font-display tracking-tighter mt-1 ${val >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${val.toFixed(2)}</div></div>
-                        <button onclick="this.closest('.fixed').remove()" class="text-3xl text-zinc-400 hover:text-white">&times;</button>
-                    </div>
-                    <div class="text-[15px] leading-relaxed text-zinc-200">${interp}</div>
-                    <div class="mt-6 text-xs bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
-                        <strong class="text-zinc-400">Mécanisme macro pointu :</strong><br>
-                        Cette corrélation s'explique par les flux internationaux de capitaux, la politique monétaire différentielle et le statut de valeur refuge de certains actifs (CHF, or, JPY).
-                    </div>
-                </div>`;
+            let interp = val > 0.65 ? 'Forte corrélation positive : les deux actifs bougent fortement ensemble via des flux de risque communs ou un dollar faible.' : val > 0.4 ? 'Corrélation positive notable due à des facteurs macro partagés.' : val > 0 ? 'Corrélation positive modérée influencée par plusieurs variables.' : val > -0.4 ? 'Corrélation négative modérée : réactions opposées à certains chocs.' : val > -0.65 ? 'Corrélation négative notable typique des relations safe-haven vs risque.' : 'Forte corrélation négative : mouvements fortement opposés (ex: dollar vs or).';
+            modal.innerHTML = `<div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-lg w-full p-7"><div class="flex justify-between mb-4"><div><span class="font-semibold text-xl">${assetNames[a1]} vs ${assetNames[a2]}</span><div class="text-5xl font-display tracking-tighter mt-1 ${val >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${val.toFixed(2)}</div></div><button onclick="this.closest('.fixed').remove()" class="text-3xl text-zinc-400 hover:text-white">&times;</button></div><div class="text-[15px] leading-relaxed text-zinc-200">${interp}</div><div class="mt-6 text-xs bg-zinc-950 p-4 rounded-2xl border border-zinc-800"><strong class="text-zinc-400">Mécanisme macro :</strong><br>Ces corrélations s'expliquent par les flux de capitaux internationaux, la politique monétaire différentielle et le statut de valeur refuge de certains actifs.</div></div>`;
             document.body.appendChild(modal);
         }
 
-        // SCENARIOS TOOL
+        // ENRICHED SCENARIOS (deeper)
         const scenarios = [
-            {
-                id: 'geo-risk',
-                title: 'Escalade géopolitique',
-                subtitle: 'Incertitude géopolitique forte (ex: conflit majeur)',
-                explanation: 'En période d\'incertitude géopolitique élevée, les investisseurs fuient les actifs risqués vers les valeurs refuges. Le franc suisse (CHF) bénéficie fortement des flux safe-haven grâce à la stabilité politique et à la politique de la BNS. L\'or monte aussi fortement. Le dollar (DXY) et le yen (JPY implicite via USDJPY inverse) sont également soutenus. Les actions (SPX, Nasdaq) et les devises cycliques (AUD, GBP) souffrent.',
-                impacts: {
-                    'CHF (via USDCHF inverse)': 'Forte hausse', 'Gold': 'Forte hausse', 'DXY': 'Hausse', 'USD/JPY': 'Baisse (yen fort)', 
-                    'EUR/USD': 'Baisse', 'GBP/USD': 'Baisse', 'AUD/USD': 'Baisse', 'S&P 500': 'Baisse', 'Nasdaq': 'Baisse', 'Silver': 'Hausse modérée'
-                }
-            },
-            {
-                id: 'fed-cuts',
-                title: 'Détente monétaire Fed aggressive',
-                subtitle: 'La Fed baisse les taux plus vite que prévu',
-                explanation: 'Des baisses de taux plus agressives de la Fed affaiblissent le dollar et soutiennent les actifs risqués. L\'or bénéficie du coût d\'opportunité plus faible. Les actions de croissance (Nasdaq) réagissent très positivement. Les devises cycliques comme l\'AUD et le GBP peuvent s\'apprécier si la croissance mondiale est perçue comme soutenue. Le DXY baisse généralement.',
-                impacts: {
-                    'DXY': 'Forte baisse', 'Gold': 'Forte hausse', 'Nasdaq': 'Forte hausse', 'S&P 500': 'Hausse', 
-                    'EUR/USD': 'Hausse', 'GBP/USD': 'Hausse', 'AUD/USD': 'Hausse', 'Silver': 'Hausse', 'USD/JPY': 'Hausse (yen faible)', 'USD/CAD': 'Baisse'
-                }
-            },
-            {
-                id: 'china-growth',
-                title: 'Surprise positive croissance Chine',
-                subtitle: 'Données économiques chinoises nettement meilleures',
-                explanation: 'Une surprise haussière sur la croissance chinoise soutient les matières premières et les devises liées à la Chine. L\'AUD/USD monte fortement (Australie très exposée à la Chine). L\'or et l\'argent peuvent aussi bénéficier via la demande industrielle et d\'investissement. Les actions cycliques mondiales sont positives. Le dollar peut légèrement faiblir.',
-                impacts: {
-                    'AUD/USD': 'Forte hausse', 'Gold': 'Hausse', 'Silver': 'Hausse', 'S&P 500': 'Hausse modérée', 
-                    'DXY': 'Légère baisse', 'EUR/USD': 'Neutre à hausse', 'USD/CAD': 'Baisse', 'Nasdaq': 'Hausse'
-                }
-            },
-            {
-                id: 'hot-inflation',
-                title: 'Inflation US plus chaude que prévu',
-                subtitle: 'CPI ou PCE plus élevé que les attentes',
-                explanation: 'Une inflation plus forte que prévu renforce les attentes de resserrement monétaire. Le dollar (DXY) monte, les rendements obligataires augmentent, et l\'or souffre. Les actions de croissance (Nasdaq) sont pénalisées. Les paires comme EUR/USD et GBP/USD baissent généralement.',
-                impacts: {
-                    'DXY': 'Forte hausse', 'Gold': 'Baisse', 'Nasdaq': 'Baisse', 'S&P 500': 'Baisse modérée', 
-                    'EUR/USD': 'Baisse', 'GBP/USD': 'Baisse', 'AUD/USD': 'Baisse', 'Silver': 'Baisse', 'USD/JPY': 'Hausse'
-                }
-            }
+            { id: 'geo-risk', title: 'Escalade géopolitique', subtitle: 'Incertitude géopolitique forte', explanation: 'Les investisseurs fuient vers les valeurs refuges. Le franc suisse (CHF) bénéficie massivement des flux safe-haven grâce à sa stabilité et à la politique de la BNS. L\'or monte fortement. Le dollar et le yen sont soutenus. Les actions et les devises cycliques (AUD, GBP) souffrent.', impacts: { 'CHF (via USDCHF)': 'Forte hausse', 'Gold': 'Forte hausse', 'DXY': 'Hausse', 'USD/JPY': 'Baisse (yen fort)', 'EUR/USD': 'Baisse', 'GBP/USD': 'Baisse', 'AUD/USD': 'Baisse', 'S&P 500': 'Baisse', 'Nasdaq': 'Baisse' } },
+            { id: 'fed-cuts', title: 'Détente monétaire Fed', subtitle: 'La Fed baisse les taux plus vite que prévu', explanation: 'Des baisses de taux agressives affaiblissent le dollar et soutiennent fortement les actifs risqués. L\'or bénéficie du coût d\'opportunité plus faible. Le Nasdaq et les actions de croissance réagissent très positivement. Les devises cycliques comme l\'AUD peuvent s\'apprécier.', impacts: { 'DXY': 'Forte baisse', 'Gold': 'Forte hausse', 'Nasdaq': 'Forte hausse', 'S&P 500': 'Hausse', 'EUR/USD': 'Hausse', 'GBP/USD': 'Hausse', 'AUD/USD': 'Hausse', 'Silver': 'Hausse', 'USD/JPY': 'Hausse (yen faible)' } },
+            { id: 'china-growth', title: 'Surprise croissance Chine', subtitle: 'Données économiques chinoises nettement meilleures', explanation: 'Une surprise haussière sur la Chine soutient les matières premières et les devises exposées. L\'AUD/USD monte fortement. L\'or et l\'argent bénéficient de la demande industrielle et d\'investissement. Les actions cycliques sont positives.', impacts: { 'AUD/USD': 'Forte hausse', 'Gold': 'Hausse', 'Silver': 'Hausse', 'S&P 500': 'Hausse modérée', 'DXY': 'Légère baisse', 'EUR/USD': 'Neutre à hausse' } },
+            { id: 'hot-inflation', title: 'Inflation US plus chaude', subtitle: 'CPI/PCE supérieur aux attentes', explanation: 'Une inflation plus forte renforce les attentes de resserrement. Le dollar monte, les rendements augmentent, l\'or souffre. Le Nasdaq est pénalisé. EUR/USD et GBP/USD baissent généralement.', impacts: { 'DXY': 'Forte hausse', 'Gold': 'Baisse', 'Nasdaq': 'Baisse', 'S&P 500': 'Baisse modérée', 'EUR/USD': 'Baisse', 'GBP/USD': 'Baisse', 'AUD/USD': 'Baisse' } },
+            { id: 'recession-fears', title: 'Craintes de récession', subtitle: 'Signaux de ralentissement économique fort', explanation: 'Les craintes de récession font fuir les actifs risqués. Les obligations montent, l\'or peut bénéficier en tant que valeur refuge. Le dollar est souvent soutenu initialement. Les actions (SPX, Nasdaq) et les devises cycliques baissent fortement.', impacts: { 'S&P 500': 'Forte baisse', 'Nasdaq': 'Forte baisse', 'Gold': 'Hausse modérée', 'DXY': 'Hausse initiale', 'EUR/USD': 'Baisse', 'AUD/USD': 'Baisse', 'Silver': 'Baisse' } },
+            { id: 'energy-crisis', title: 'Pic des prix de l\'énergie', subtitle: 'Hausse brutale du pétrole et du gaz', explanation: 'Un choc énergétique fait monter l\'inflation et pèse sur la croissance. Le dollar peut être soutenu. L\'or bénéficie souvent en période d\'incertitude. Les actions sont généralement négatives, surtout les secteurs sensibles à l\'énergie.', impacts: { 'DXY': 'Hausse', 'Gold': 'Hausse', 'S&P 500': 'Baisse', 'Nasdaq': 'Baisse', 'EUR/USD': 'Baisse', 'AUD/USD': 'Baisse', 'Silver': 'Hausse modérée' } }
         ];
 
         function initScenarios() {
             const container = document.getElementById('scenario-buttons');
             container.innerHTML = '';
-
             scenarios.forEach(sc => {
                 const card = document.createElement('div');
                 card.className = 'scenario-card cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-3xl p-5';
-                card.innerHTML = `
-                    <div class="font-semibold text-lg mb-1">${sc.title}</div>
-                    <div class="text-sm text-zinc-400">${sc.subtitle}</div>
-                `;
+                card.innerHTML = `<div class="font-semibold text-lg mb-1">${sc.title}</div><div class="text-sm text-zinc-400">${sc.subtitle}</div>`;
                 card.onclick = () => showScenario(sc.id);
                 container.appendChild(card);
             });
@@ -543,42 +285,26 @@
         function showScenario(id) {
             const sc = scenarios.find(s => s.id === id);
             if (!sc) return;
-
             document.getElementById('scenario-result').classList.remove('hidden');
             document.getElementById('scenario-title').textContent = sc.title;
             document.getElementById('scenario-subtitle').textContent = sc.subtitle;
             document.getElementById('scenario-explanation').innerHTML = sc.explanation;
-
             const impactsDiv = document.getElementById('scenario-impacts');
             impactsDiv.innerHTML = '';
-
             Object.entries(sc.impacts).forEach(([asset, impact]) => {
                 const div = document.createElement('div');
                 let color = 'text-zinc-300';
-                if (impact.toLowerCase().includes('hausse') || impact.toLowerCase().includes('forte hausse')) color = 'impact-positive';
-                else if (impact.toLowerCase().includes('baisse') || impact.toLowerCase().includes('forte baisse')) color = 'impact-negative';
-
+                if (impact.toLowerCase().includes('hausse')) color = 'impact-positive';
+                else if (impact.toLowerCase().includes('baisse')) color = 'impact-negative';
                 div.innerHTML = `<div class="bg-zinc-950 border border-zinc-700 rounded-2xl p-3"><div class="text-xs text-zinc-400">${asset}</div><div class="font-medium mt-0.5 ${color}">${impact}</div></div>`;
                 impactsDiv.appendChild(div);
             });
-
-            // Scroll to result
             document.getElementById('scenario-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function clearScenario() {
-            document.getElementById('scenario-result').classList.add('hidden');
-        }
+        function clearScenario() { document.getElementById('scenario-result').classList.add('hidden'); }
 
-        // AI Insights
-        const insightsData = {
-            'dxy-gold': { title: 'DXY vs Gold', content: 'Corrélation négative forte (-0.67). Le dollar fort pèse sur l\'or via le coût d\'opportunité et les flux. Inversement, un dollar faible + taux bas crée un environnement très favorable à l\'or.' },
-            'rates-nasdaq': { title: 'Taux & Nasdaq', content: 'Baisses de taux Fed soutiennent fortement le Nasdaq via valorisation plus élevée des flux futurs. Effet amplifié sur les growth stocks.' },
-            'inflation-forex': { title: 'Inflation & Forex', content: 'Inflation US chaude renforce le dollar via attentes de resserrement. EUR/USD et GBP/USD baissent généralement dans ce régime.' },
-            'gold-silver': { title: 'Gold vs Silver', content: 'Corrélation très forte (0.82). L\'argent amplifie les mouvements de l\'or mais est plus sensible au cycle industriel.' },
-            'aud-china': { title: 'AUD & Chine', content: 'L\'AUD est l\'une des devises les plus corrélées à la croissance chinoise et aux prix des matières premières.' },
-            'gbp-rates': { title: 'GBP & UK Rates', content: 'La livre réagit fortement aux écarts de politique monétaire BoE vs Fed. Un resserrement relatif de la BoE soutient le GBP.' }
-        };
+        const insightsData = { 'dxy-gold': { title: 'DXY vs Gold', content: 'Corrélation négative forte. Un dollar fort pèse sur l\'or via le coût d\'opportunité et les flux. Inversement, dollar faible + taux bas = environnement très favorable à l\'or.' }, 'rates-nasdaq': { title: 'Taux & Nasdaq', content: 'Baisses de taux Fed soutiennent fortement le Nasdaq via une valorisation plus élevée des flux futurs des entreprises technologiques.' }, 'inflation-forex': { title: 'Inflation & Forex', content: 'Inflation US chaude renforce le dollar via attentes de resserrement. EUR/USD et GBP/USD baissent généralement dans ce régime.' }, 'gold-silver': { title: 'Gold vs Silver', content: 'Corrélation très forte (0.82). L\'argent amplifie les mouvements de l\'or mais reste plus sensible au cycle industriel.' }, 'aud-china': { title: 'AUD & Chine', content: 'L\'AUD est l\'une des devises les plus corrélées à la croissance chinoise et aux prix des matières premières.' }, 'gbp-rates': { title: 'GBP & UK Rates', content: 'La livre réagit fortement aux écarts de politique monétaire entre la BoE et la Fed.' } };
 
         function initInsights() {
             const container = document.getElementById('insight-buttons');
@@ -593,45 +319,19 @@
         }
 
         let currentInsight = null;
-        function showInsight(key) {
-            currentInsight = key;
-            const data = insightsData[key];
-            document.getElementById('insight-content').innerHTML = `<div class="font-semibold text-lg mb-2">${data.title}</div><div class="leading-relaxed">${data.content}</div>`;
-        }
-
-        function regenerateInsight() {
-            if (!currentInsight) currentInsight = Object.keys(insightsData)[0];
-            showInsight(currentInsight);
-        }
+        function showInsight(key) { currentInsight = key; const data = insightsData[key]; document.getElementById('insight-content').innerHTML = `<div class="font-semibold text-lg mb-2">${data.title}</div><div class="leading-relaxed">${data.content}</div>`; }
+        function regenerateInsight() { if (!currentInsight) currentInsight = Object.keys(insightsData)[0]; showInsight(currentInsight); }
 
         let trendChart;
         function initTrendChart() {
             const ctx = document.getElementById('correlationTrendChart');
             if (trendChart) trendChart.destroy();
-            trendChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Mar', 'Mai', 'Juil', 'Sep', 'Nov', 'Jan', 'Mar', 'Mai'],
-                    datasets: [{
-                        label: 'Corrélation DXY-Gold (3M rolling)',
-                        data: [-0.58, -0.65, -0.71, -0.68, -0.74, -0.69, -0.67, -0.71, -0.67],
-                        borderColor: '#c026ff',
-                        borderWidth: 2.5,
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(192, 38, 255, 0.08)'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: -1, max: 0, ticks: { stepSize: 0.2 } } } }
-            });
+            trendChart = new Chart(ctx, { type: 'line', data: { labels: ['Jan', 'Mar', 'Mai', 'Juil', 'Sep', 'Nov', 'Jan', 'Mar', 'Mai'], datasets: [{ label: 'Corrélation DXY-Gold (3M rolling)', data: [-0.58, -0.65, -0.71, -0.68, -0.74, -0.69, -0.67, -0.71, -0.67], borderColor: '#c026ff', borderWidth: 2.5, tension: 0.4, fill: true, backgroundColor: 'rgba(192, 38, 255, 0.08)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: -1, max: 0, ticks: { stepSize: 0.2 } } } } });
         }
 
         function refreshData() {
             renderCorrelationTable();
-            if (trendChart) {
-                trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(-0.95, Math.min(-0.4, v + (Math.random()-0.5)*0.04)));
-                trendChart.update();
-            }
+            if (trendChart) { trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(-0.95, Math.min(-0.4, v + (Math.random()-0.5)*0.04))); trendChart.update(); }
             const toast = document.createElement('div');
             toast.className = 'fixed bottom-6 right-6 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 px-5 py-3 rounded-3xl text-sm flex items-center gap-x-3';
             toast.innerHTML = '<i class="fas fa-check-circle"></i> <span>Données actualisées</span>';
@@ -645,13 +345,8 @@
             initScenarios();
             initInsights();
             initTrendChart();
-
-            setTimeout(() => {
-                const first = document.querySelector('#insight-buttons button');
-                if (first) first.click();
-            }, 700);
-
-            console.log('%c[MacroLink v3] Dashboard + Outil Scénarios initialisé.', 'color:#64748b');
+            setTimeout(() => { const first = document.querySelector('#insight-buttons button'); if (first) first.click(); }, 700);
+            console.log('%c[MacroLink] Dashboard enrichi avec scénarios + pub partenaire propre.', 'color:#64748b');
         }
 
         window.onload = initDashboard;
