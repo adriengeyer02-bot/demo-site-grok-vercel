@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GrokWeb • Site Moderne</title>
+    <title>MacroLink • Dashboard Macro & Interconnexions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
-        
-        :root {
-            --primary: #6366f1;
-        }
         
         body {
             font-family: 'Inter', system_ui, sans-serif;
@@ -22,14 +19,8 @@
             font-weight: 600;
         }
 
-        .gradient-text {
-            background: linear-gradient(90deg, #6366f1, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         .section-header {
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             line-height: 1.1;
             font-weight: 700;
             letter-spacing: -0.025em;
@@ -39,367 +30,438 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .nav-link:hover {
+        .nav-link:hover, .nav-link.active {
             color: #6366f1;
-            transform: translateY(-1px);
         }
 
-        .feature-card {
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), 
-                       box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        .dashboard-card {
+            transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                       box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        .dashboard-card:hover {
+            transform: translateY(-2px);
         }
 
-        .modern-shadow {
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-                        0 4px 6px -4px rgb(0 0 0 / 0.1);
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
+
+        .correlation-cell {
+            transition: all 0.1s ease;
+            cursor: pointer;
+        }
+        
+        .correlation-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            position: relative;
         }
 
         .glass {
-            background: rgba(255,255,255, 0.05);
+            background: rgba(255,255,255, 0.04);
             backdrop-filter: blur(12px);
         }
 
-        .hero-bg {
-            background: radial-gradient(at center, #18181b 0%, #09090b 100%);
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #27272a;
         }
 
-        .stat-number {
-            font-variant-numeric: tabular-nums;
+        .insight-card {
+            background: linear-gradient(145deg, #18181b, #27272a);
+        }
+
+        .asset-pill {
+            transition: all 0.2s ease;
+        }
+        
+        .asset-pill.active {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .macro-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1;
         }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200">
     <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="px-6 py-5 flex items-center justify-between">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center gap-x-3">
-                    <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center">
-                        <span class="text-white font-bold text-2xl tracking-tighter">G</span>
+                    <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 rounded-2xl flex items-center justify-center shadow-inner">
+                        <span class="text-white font-bold text-2xl tracking-tighter">M</span>
                     </div>
-                    <div>
-                        <span class="font-display text-2xl font-semibold tracking-tighter">GrokWeb</span>
+                    <div class="flex items-baseline gap-x-1">
+                        <span class="font-display text-2xl font-semibold tracking-tighter">MacroLink</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono tracking-widest">BETA</span>
                     </div>
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-x-8 text-sm">
-                    <a href="#accueil" class="nav-link text-zinc-300 hover:text-white font-medium">Accueil</a>
-                    <a href="#fonctionnalites" class="nav-link text-zinc-300 hover:text-white font-medium">Fonctionnalités</a>
-                    <a href="#demo" class="nav-link text-zinc-300 hover:text-white font-medium">Démo</a>
-                    <a href="#processus" class="nav-link text-zinc-300 hover:text-white font-medium">Comment c'est fait</a>
+                <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                    <a href="#overview" class="nav-link text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl">Vue d'ensemble</a>
+                    <a href="#correlations" class="nav-link text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl">Corrélations</a>
+                    <a href="#drivers" class="nav-link text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl">Macro Drivers</a>
+                    <a href="#insights" class="nav-link text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl">AI Insights</a>
                 </div>
 
-                <div class="hidden md:flex items-center gap-x-4">
-                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" 
-                       target="_blank"
-                       class="px-5 py-2.5 text-sm font-medium text-zinc-300 hover:text-white transition-colors flex items-center gap-x-2">
-                        <i class="fab fa-github"></i>
-                        <span>Voir le code</span>
-                    </a>
-                    <button onclick="deployToVercel()"
-                            class="px-6 py-2.5 bg-white text-zinc-950 hover:bg-zinc-100 transition-all font-semibold text-sm rounded-3xl flex items-center gap-x-2 shadow-lg shadow-white/10">
-                        <span>Déployer sur Vercel</span>
+                <div class="hidden md:flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2 text-xs bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-emerald-400 font-medium">Données mises à jour il y a 12 min</span>
+                    </div>
+                    
+                    <button onclick="refreshData()" 
+                            class="flex items-center gap-x-2 px-4 py-2 text-sm font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl transition-colors">
+                        <i class="fas fa-sync-alt text-xs"></i>
+                        <span>Actualiser</span>
                     </button>
+
+                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank"
+                       class="px-4 py-2 text-sm font-medium flex items-center gap-x-2 text-zinc-300 hover:text-white">
+                        <i class="fab fa-github"></i>
+                    </a>
                 </div>
 
-                <!-- Mobile menu button -->
-                <button id="mobile-menu-btn"
-                        class="md:hidden w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white">
+                <!-- Mobile -->
+                <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center text-zinc-400">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950">
-            <div class="px-6 py-6 flex flex-col gap-y-4 text-sm">
-                <a href="#accueil" class="py-2 text-zinc-300">Accueil</a>
-                <a href="#fonctionnalites" class="py-2 text-zinc-300">Fonctionnalités</a>
-                <a href="#demo" class="py-2 text-zinc-300">Démo</a>
-                <a href="#processus" class="py-2 text-zinc-300">Comment c'est fait</a>
-                
-                <div class="pt-4 border-t border-zinc-800 flex flex-col gap-y-3">
-                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank"
-                       class="flex items-center gap-x-2 text-zinc-300">
-                        <i class="fab fa-github"></i>
-                        <span>Voir sur GitHub</span>
-                    </a>
-                    <button onclick="deployToVercel()"
-                            class="w-full py-3 bg-white text-zinc-950 font-semibold rounded-3xl text-sm">
-                        Déployer sur Vercel
-                    </button>
+        <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950 px-6 py-4">
+            <div class="flex flex-col gap-y-1 text-sm">
+                <a href="#overview" class="py-2.5 px-3 text-zinc-300">Vue d'ensemble</a>
+                <a href="#correlations" class="py-2.5 px-3 text-zinc-300">Corrélations</a>
+                <a href="#drivers" class="py-2.5 px-3 text-zinc-300">Macro Drivers</a>
+                <a href="#insights" class="py-2.5 px-3 text-zinc-300">AI Insights</a>
+                <div class="pt-3 mt-2 border-t border-zinc-800 flex gap-x-3">
+                    <button onclick="refreshData()" class="flex-1 py-2.5 text-sm bg-zinc-900 rounded-2xl">Actualiser les données</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="accueil" class="pt-20 hero-bg min-h-[100dvh] flex items-center relative overflow-hidden">
-        <div class="max-w-5xl mx-auto px-6 pt-12 pb-20 text-center relative z-10">
-            <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
-                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span class="text-emerald-400 text-sm font-medium tracking-wider">NOUVEAU • Propulsé par Grok + Vercel</span>
+    <!-- Header -->
+    <div class="pt-16 max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-y-4 pt-8 pb-6">
+            <div>
+                <div class="flex items-center gap-x-3 mb-2">
+                    <span class="px-3 py-1 text-xs font-medium tracking-widest bg-indigo-950 text-indigo-400 rounded-full">MACRO • INTERCONNEXIONS</span>
+                </div>
+                <h1 class="font-display text-5xl tracking-tighter">Macro Interconnection Dashboard</h1>
+                <p class="text-xl text-zinc-400 mt-2 max-w-lg">Visualisez les liens fondamentaux entre les actifs les plus tradés du marché.</p>
             </div>
-
-            <h1 class="text-6xl md:text-7xl font-display tracking-tighter leading-none mb-6">
-                Ton site web.<br>
-                <span class="gradient-text">En quelques minutes.</span>
-            </h1>
             
-            <p class="max-w-md mx-auto text-xl text-zinc-400 mb-10">
-                Je viens de créer ce site moderne et élégant en utilisant GitHub et Vercel. 
-                Tout ça grâce à mes outils de build connectés.
-            </p>
-
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button onclick="document.getElementById('fonctionnalites').scrollIntoView({ behavior: 'smooth' })" 
-                        class="px-8 py-4 bg-white text-zinc-950 hover:bg-zinc-100 font-semibold rounded-3xl text-base transition-all active:scale-[0.985] flex items-center justify-center gap-x-3 shadow-xl shadow-white/20">
-                    <span>Découvrir les fonctionnalités</span>
-                </button>
-                
-                <button onclick="document.getElementById('demo').scrollIntoView({ behavior: 'smooth' })" 
-                        class="px-8 py-4 border border-zinc-700 hover:bg-zinc-900 font-medium rounded-3xl text-base transition-all flex items-center justify-center gap-x-3">
-                    <i class="fas fa-play mr-2"></i>
-                    <span>Voir la démo interactive</span>
-                </button>
-            </div>
-
-            <div class="mt-16 flex justify-center">
-                <div class="flex items-center gap-x-8 text-sm">
-                    <div class="flex -space-x-2">
-                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=12" class="w-full h-full object-cover"></div>
-                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=28" class="w-full h-full object-cover"></div>
-                        <div class="w-8 h-8 bg-zinc-700 rounded-full border-2 border-zinc-950 overflow-hidden"><img src="https://i.pravatar.cc/32?img=47" class="w-full h-full object-cover"></div>
+            <div class="flex items-center gap-x-4">
+                <div class="text-right">
+                    <div class="text-xs text-zinc-500">Régime de marché actuel</div>
+                    <div class="font-semibold text-emerald-400 flex items-center gap-x-2 justify-end">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Risk-On modéré</span>
                     </div>
-                    <div class="text-left">
-                        <div class="text-emerald-400 text-xs tracking-widest font-medium">DÉJÀ UTILISÉ PAR</div>
-                        <div class="text-zinc-400 text-sm">+ de 12 400 créateurs</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Subtle grid -->
-        <div class="absolute inset-0 bg-[radial-gradient(#27272a_0.8px,transparent_1px)] bg-[length:5px_5px] opacity-40 pointer-events-none"></div>
-    </section>
-
-    <!-- Stats -->
-    <div class="border-b border-zinc-800 bg-zinc-900/50">
-        <div class="max-w-6xl mx-auto px-6 py-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">98</div>
-                    <div class="text-zinc-400 text-sm mt-1">Projets créés aujourd'hui</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">4.9</div>
-                    <div class="text-zinc-400 text-sm mt-1">Note moyenne des utilisateurs</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">< 60s</div>
-                    <div class="text-zinc-400 text-sm mt-1">Temps de déploiement moyen</div>
-                </div>
-                <div>
-                    <div class="text-4xl font-display font-semibold tracking-tighter stat-number">100%</div>
-                    <div class="text-zinc-400 text-sm mt-1">Sites 100% responsive</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <section id="fonctionnalites" class="max-w-6xl mx-auto px-6 pt-20 pb-16">
-        <div class="text-center mb-12">
-            <div class="inline-block px-4 py-1 rounded-full bg-indigo-950 text-indigo-400 text-xs font-medium tracking-[1.5px] mb-4">CE QUI REND CE SITE UNIQUE</div>
-            <h2 class="section-header tracking-tighter">Tout ce dont tu as besoin,<br>rien de superflu.</h2>
+    <!-- Quick Macro Snapshot -->
+    <div id="overview" class="max-w-7xl mx-auto px-6 pb-8">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <!-- Metric Cards -->
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs text-zinc-400">Fed Funds Rate</div>
+                        <div class="macro-value mt-1 text-white">4.25-4.50%</div>
+                    </div>
+                    <i class="fas fa-university text-indigo-400 text-xl mt-1"></i>
+                </div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
+                    <i class="fas fa-arrow-down"></i> <span>-25 bps depuis déc. 2025</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs text-zinc-400">US CPI (YoY)</div>
+                        <div class="macro-value mt-1 text-white">2.7%</div>
+                    </div>
+                    <i class="fas fa-globe text-violet-400 text-xl mt-1"></i>
+                </div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
+                    <i class="fas fa-check"></i> <span>Proche de la cible</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs text-zinc-400">DXY</div>
+                        <div class="macro-value mt-1 text-white">103.85</div>
+                    </div>
+                    <i class="fas fa-dollar-sign text-amber-400 text-xl mt-1"></i>
+                </div>
+                <div class="text-rose-400 text-xs mt-3 flex items-center gap-x-1">
+                    <i class="fas fa-arrow-down"></i> <span>-1.8% ce mois</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs text-zinc-400">VIX</div>
+                        <div class="macro-value mt-1 text-white">18.4</div>
+                    </div>
+                    <i class="fas fa-chart-area text-emerald-400 text-xl mt-1"></i>
+                </div>
+                <div class="text-emerald-400 text-xs mt-3 flex items-center gap-x-1">
+                    <i class="fas fa-check"></i> <span>Faible volatilité</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-xs text-zinc-400">10Y Treasury Yield</div>
+                        <div class="macro-value mt-1 text-white">4.12%</div>
+                    </div>
+                    <i class="fas fa-percent text-sky-400 text-xl mt-1"></i>
+                </div>
+                <div class="text-zinc-400 text-xs mt-3">Stable • courbe plate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assets Overview -->
+    <div class="max-w-7xl mx-auto px-6 pb-10">
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="font-semibold text-xl tracking-tight">Actifs prioritaires</h2>
+            <span class="text-xs px-3 py-1 bg-zinc-900 rounded-2xl text-zinc-400">Les plus tradés • Données illustratives</span>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6">
-            <!-- Feature 1 -->
-            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-                <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-magic text-indigo-400 text-3xl"></i>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+            <!-- Asset pills -->
+            <div onclick="selectAsset(this, 'EURUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">EUR/USD</span>
                 </div>
-                <h3 class="font-semibold text-2xl tracking-tight mb-3">Design moderne & élégant</h3>
-                <p class="text-zinc-400 leading-relaxed">Interface épurée, animations fluides et typographie soignée. Parfaitement optimisé pour tous les écrans.</p>
+                <div class="text-right">
+                    <div class="text-emerald-400 text-xs">+0.42%</div>
+                    <div class="text-[10px] text-zinc-500">1.0850</div>
+                </div>
             </div>
 
-            <!-- Feature 2 -->
-            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-                <div class="w-12 h-12 bg-violet-500/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-bolt text-violet-400 text-3xl"></i>
+            <div onclick="selectAsset(this, 'USDJPY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">USD/JPY</span>
                 </div>
-                <h3 class="font-semibold text-2xl tracking-tight mb-3">Déploiement instantané</h3>
-                <p class="text-zinc-400 leading-relaxed">Grâce à Vercel, ton site est en ligne en moins d'une minute. HTTPS, CDN mondial et mises à jour automatiques inclus.</p>
+                <div class="text-right">
+                    <div class="text-rose-400 text-xs">-0.31%</div>
+                    <div class="text-[10px] text-zinc-500">148.65</div>
+                </div>
             </div>
 
-            <!-- Feature 3 -->
-            <div class="feature-card bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
-                <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-robot text-emerald-400 text-3xl"></i>
+            <div onclick="selectAsset(this, 'XAUUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">Gold</span>
                 </div>
-                <h3 class="font-semibold text-2xl tracking-tight mb-3">Créé par l'IA (Grok)</h3>
-                <p class="text-zinc-400 leading-relaxed">Ce site a été entièrement conçu et codé par Grok en quelques secondes. Tu peux demander n'importe quel type de site.</p>
+                <div class="text-right">
+                    <div class="text-emerald-400 text-xs">+1.12%</div>
+                    <div class="text-[10px] text-zinc-500">2,685</div>
+                </div>
+            </div>
+
+            <div onclick="selectAsset(this, 'XAGUSD')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">Silver</span>
+                </div>
+                <div class="text-right">
+                    <div class="text-emerald-400 text-xs">+0.87%</div>
+                    <div class="text-[10px] text-zinc-500">31.45</div>
+                </div>
+            </div>
+
+            <div onclick="selectAsset(this, 'SPX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">S&P 500</span>
+                </div>
+                <div class="text-right">
+                    <div class="text-emerald-400 text-xs">+0.65%</div>
+                    <div class="text-[10px] text-zinc-500">5,980</div>
+                </div>
+            </div>
+
+            <div onclick="selectAsset(this, 'NDX')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">Nasdaq</span>
+                </div>
+                <div class="text-right">
+                    <div class="text-emerald-400 text-xs">+0.91%</div>
+                    <div class="text-[10px] text-zinc-500">19,450</div>
+                </div>
+            </div>
+
+            <div onclick="selectAsset(this, 'DXY')" class="asset-pill cursor-pointer flex items-center justify-between bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm active:scale-[0.985]">
+                <div class="flex items-center gap-x-3">
+                    <span class="font-mono font-semibold">DXY</span>
+                </div>
+                <div class="text-right">
+                    <div class="text-rose-400 text-xs">-0.55%</div>
+                    <div class="text-[10px] text-zinc-500">103.85</div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Interactive Demo Section -->
-    <section id="demo" class="bg-zinc-900 border-y border-zinc-800 py-16">
-        <div class="max-w-5xl mx-auto px-6">
-            <div class="grid md:grid-cols-12 gap-x-12 items-center">
-                <div class="md:col-span-5 mb-10 md:mb-0">
-                    <div class="sticky top-24">
-                        <div class="text-indigo-400 text-sm font-medium tracking-widest mb-3">ESSAIE MAINTENANT</div>
-                        <h2 class="section-header tracking-tighter mb-5">Une démo interactive<br>pour te convaincre.</h2>
-                        <p class="text-zinc-400 text-lg">Ce bouton change le thème du site en temps réel. C'est juste un exemple de ce qu'on peut faire avec un peu de JavaScript.</p>
-                        
-                        <div class="mt-8 flex items-center gap-x-4">
-                            <button onclick="changeTheme()" 
-                                    class="flex-1 md:flex-none px-7 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl flex items-center justify-center gap-x-3 hover:bg-zinc-100 transition-colors">
-                                <i class="fas fa-palette"></i>
-                                <span>Changer le thème</span>
-                            </button>
+    <!-- Correlations Section -->
+    <div id="correlations" class="max-w-7xl mx-auto px-6 pb-12">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <h2 class="font-semibold text-xl tracking-tight">Matrice de corrélations</h2>
+                <p class="text-sm text-zinc-400">Corrélations historiques sur 1 an (illustratives)</p>
+            </div>
+            <div class="text-xs text-zinc-500 hidden md:block">Cliquez sur une cellule pour voir les détails</div>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 overflow-x-auto">
+            <table class="w-full min-w-[720px] text-sm data-table">
+                <thead>
+                    <tr class="text-zinc-400 text-xs">
+                        <th class="text-left w-28">Actif</th>
+                        <th>EUR/USD</th>
+                        <th>USD/JPY</th>
+                        <th>Gold</th>
+                        <th>Silver</th>
+                        <th>S&P 500</th>
+                        <th>Nasdaq</th>
+                        <th>DXY</th>
+                    </tr>
+                </thead>
+                <tbody id="correlation-table">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="text-[10px] text-zinc-500 mt-3 px-1">Les valeurs sont des corrélations de rendements quotidiens. Les corrélations évoluent avec les régimes macro.</div>
+    </div>
+
+    <!-- Macro Drivers -->
+    <div id="drivers" class="max-w-7xl mx-auto px-6 pb-12">
+        <h2 class="font-semibold text-xl tracking-tight mb-6">Principaux drivers macroéconomiques</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Driver 1 -->
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+                <div class="flex gap-x-4">
+                    <div class="w-11 h-11 flex-shrink-0 bg-indigo-500/10 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-university text-indigo-400 text-2xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold">Politique monétaire (Fed)</div>
+                        <div class="text-sm text-zinc-400 mt-1">Les baisses de taux soutiennent généralement les actifs risqués (actions, or) et pèsent sur le dollar.</div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl">Impact fort sur DXY (-)</span>
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl">Impact fort sur Gold (+)</span>
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl">Impact modéré sur Nasdaq (+)</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="md:col-span-7">
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 modern-shadow">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <div class="font-semibold">Mode actuel</div>
-                                <div id="current-theme" class="text-emerald-400 font-medium">Sombre (par défaut)</div>
-                            </div>
-                            <div class="px-3 py-1 bg-zinc-900 rounded-2xl text-xs font-mono border border-zinc-700">v1.0</div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
-                                <div class="flex items-center gap-x-3">
-                                    <i class="fas fa-moon text-xl w-5"></i>
-                                    <span>Thème sombre</span>
-                                </div>
-                                <div class="w-11 h-6 bg-emerald-500 rounded-full relative">
-                                    <div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow"></div>
-                                </div>
-                            </div>
-                            
-                            <div onclick="simulateAIResponse()" class="cursor-pointer flex justify-between items-center p-4 bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-2xl group">
-                                <div class="flex items-center gap-x-3">
-                                    <i class="fas fa-magic text-xl w-5 text-violet-400 group-hover:scale-110 transition-transform"></i>
-                                    <span>Demander à l'IA de modifier le site</span>
-                                </div>
-                                <i class="fas fa-arrow-right text-zinc-500 group-hover:text-white transition-colors"></i>
-                            </div>
+            <div class="dashboard-card bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+                <div class="flex gap-x-4">
+                    <div class="w-11 h-11 flex-shrink-0 bg-amber-500/10 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-globe text-amber-400 text-2xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold">Inflation & croissance US</div>
+                        <div class="text-sm text-zinc-400 mt-1">Une inflation plus élevée que prévu renforce généralement le dollar et pèse sur l'or et les actions de croissance.</div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl">Impact fort sur DXY (+)</span>
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl">Impact fort sur Gold (-)</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Process Section -->
-    <section id="processus" class="max-w-5xl mx-auto px-6 py-20">
-        <div class="text-center mb-12">
-            <div class="text-indigo-400 text-sm font-medium tracking-[1.5px] mb-3">COMMENT ÇA MARCHE</div>
-            <h2 class="section-header tracking-tighter">Créé en moins de 2 minutes</h2>
-        </div>
-
-        <div class="max-w-3xl mx-auto">
-            <div class="space-y-8">
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">01</div>
-                    <div class="flex-1 pt-1">
-                        <div class="font-semibold text-xl tracking-tight">Création du dépôt GitHub</div>
-                        <div class="text-zinc-400 mt-1.5">J'ai créé automatiquement un nouveau dépôt GitHub public avec tous les fichiers du site.</div>
-                    </div>
-                </div>
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">02</div>
-                    <div class="flex-1 pt-1">
-                        <div class="font-semibold text-xl tracking-tight">Ajout du code HTML + Tailwind</div>
-                        <div class="text-zinc-400 mt-1.5">Un site complet, responsive, avec animations et interactions JavaScript, le tout dans un seul fichier optimisé.</div>
-                    </div>
-                </div>
-                <div class="flex gap-6">
-                    <div class="flex-shrink-0 w-9 h-9 rounded-2xl bg-zinc-800 flex items-center justify-center font-mono text-sm font-bold border border-zinc-700">03</div>
-                    <div class="flex-1 pt-1">
-                        <div class="font-semibold text-xl tracking-tight">Déploiement sur Vercel (en 1 clic)</div>
-                        <div class="text-zinc-400 mt-1.5">Le dépôt GitHub est prêt à être importé sur Vercel. Tu obtiens une URL personnalisée en quelques secondes avec HTTPS et performance optimale.</div>
-                    </div>
-                </div>
+    <!-- AI Insights Section -->
+    <div id="insights" class="max-w-7xl mx-auto px-6 pb-16">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="font-semibold text-xl tracking-tight">AI Insights</h2>
+                <p class="text-sm text-zinc-400">Explications générées à partir des données macro et des interconnexions historiques</p>
             </div>
         </div>
 
-        <div class="mt-12 text-center">
-            <a href="https://vercel.com/new/git?repository-url=https%3A%2F%2Fgithub.com%2Fadriengeyer02-bot%2Fdemo-site-grok-vercel" 
-               target="_blank"
-               class="inline-flex items-center gap-x-3 px-8 py-4 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-semibold rounded-3xl text-base transition-all active:scale-[0.985]">
-                <span>Déployer ce site sur Vercel maintenant</span>
-                <i class="fas fa-external-link-alt"></i>
-            </a>
-            <p class="text-xs text-zinc-500 mt-3">Connecte ton compte GitHub → Importe le repo → C'est en ligne !</p>
-        </div>
-    </section>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8">
+            <div class="flex flex-wrap gap-2 mb-6" id="insight-buttons">
+                <!-- Populated by JS -->
+            </div>
 
-    <!-- Final CTA -->
-    <div class="bg-zinc-900 border-t border-zinc-800">
-        <div class="max-w-3xl mx-auto px-6 py-16 text-center">
-            <h2 class="text-4xl font-display tracking-tighter mb-4">Tu veux ton propre site ?</h2>
-            <p class="text-zinc-400 text-lg max-w-md mx-auto">Dis-moi ce que tu veux (portfolio, landing page, blog, boutique...) et je te le construis en quelques minutes avec GitHub + Vercel.</p>
-            
-            <div class="mt-8">
-                <button onclick="contactMe()" 
-                        class="px-10 py-4 bg-white text-zinc-950 font-semibold rounded-3xl text-lg hover:bg-zinc-100 transition-all shadow-xl">
-                    Demander mon site personnalisé
+            <div id="insight-content" class="prose prose-invert max-w-none text-zinc-300 leading-relaxed">
+                Sélectionnez un thème ci-dessus pour voir l'analyse des interconnexions fondamentales.
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-zinc-700 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-x-2 text-zinc-500">
+                    <i class="fas fa-robot"></i>
+                    <span>Insight généré à partir de données macro publiques et corrélations historiques</span>
+                </div>
+                <button onclick="regenerateInsight()" 
+                        class="flex items-center gap-x-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-xs font-medium transition-colors">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Régénérer</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-black border-t border-zinc-800 py-12">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-y-6 text-sm">
-                <div class="flex items-center gap-x-2 text-zinc-400">
-                    <div class="w-6 h-6 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl flex items-center justify-center">
-                        <span class="text-[10px] font-bold text-white">G</span>
-                    </div>
-                    <span>Créé avec <span class="text-white font-medium">Grok</span> • 2026</span>
-                </div>
-                
-                <div class="flex items-center gap-x-6 text-zinc-400">
-                    <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank" class="hover:text-white transition-colors">GitHub</a>
-                    <a href="#" onclick="window.location.reload()" class="hover:text-white transition-colors">Recharger</a>
-                    <span class="text-zinc-700">•</span>
-                    <span class="text-xs">100% open source</span>
-                </div>
+    <footer class="border-t border-zinc-800 bg-black py-8">
+        <div class="max-w-7xl mx-auto px-6 text-xs text-zinc-500 flex flex-col md:flex-row md:items-center justify-between gap-y-3">
+            <div>
+                MacroLink • Outil de visualisation des interconnexions macroéconomiques.<br>
+                Les données sont illustratives et à but éducatif uniquement. Ceci n'est pas un conseil en investissement.
+            </div>
+            <div class="flex items-center gap-x-5">
+                <a href="https://github.com/adriengeyer02-bot/demo-site-grok-vercel" target="_blank" class="hover:text-zinc-300">GitHub</a>
+                <span>•</span>
+                <span>Conçu avec Grok</span>
             </div>
         </div>
     </footer>
 
     <script>
-        // Tailwind script
-        function initializeTailwind() {
-            document.documentElement.style.setProperty('--accent', '#6366f1');
+        // Tailwind
+        function initTailwind() {
+            // Already configured via CDN
         }
 
         // Mobile menu
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (mobileBtn && mobileMenu) {
-            mobileBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                const icon = mobileBtn.querySelector('i');
+        function initMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            if (!btn || !menu) return;
+            
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+                const icon = btn.querySelector('i');
                 if (icon) {
                     icon.classList.toggle('fa-bars');
                     icon.classList.toggle('fa-times');
@@ -407,240 +469,307 @@
             });
         }
 
-        // Smooth scroll for all anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    // Close mobile menu if open
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                        const icon = mobileBtn.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('fa-times');
-                            icon.classList.add('fa-bars');
-                        }
-                    }
-                }
-            });
-        });
+        // Correlation data (illustrative - 1 year daily returns)
+        const correlationData = {
+            'EURUSD': { 'EURUSD': 1.00, 'USDJPY': -0.72, 'XAUUSD': 0.45, 'XAGUSD': 0.38, 'SPX': 0.28, 'NDX': 0.31, 'DXY': -0.89 },
+            'USDJPY': { 'EURUSD': -0.72, 'USDJPY': 1.00, 'XAUUSD': -0.51, 'XAGUSD': -0.42, 'SPX': -0.19, 'NDX': -0.22, 'DXY': 0.81 },
+            'XAUUSD': { 'EURUSD': 0.45, 'USDJPY': -0.51, 'XAUUSD': 1.00, 'XAGUSD': 0.82, 'SPX': 0.12, 'NDX': 0.09, 'DXY': -0.67 },
+            'XAGUSD': { 'EURUSD': 0.38, 'USDJPY': -0.42, 'XAUUSD': 0.82, 'XAGUSD': 1.00, 'SPX': 0.08, 'NDX': 0.05, 'DXY': -0.58 },
+            'SPX':    { 'EURUSD': 0.28, 'USDJPY': -0.19, 'XAUUSD': 0.12, 'XAGUSD': 0.08, 'SPX': 1.00, 'NDX': 0.94, 'DXY': -0.31 },
+            'NDX':    { 'EURUSD': 0.31, 'USDJPY': -0.22, 'XAUUSD': 0.09, 'XAGUSD': 0.05, 'SPX': 0.94, 'NDX': 1.00, 'DXY': -0.35 },
+            'DXY':    { 'EURUSD': -0.89, 'USDJPY': 0.81, 'XAUUSD': -0.67, 'XAGUSD': -0.58, 'SPX': -0.31, 'NDX': -0.35, 'DXY': 1.00 }
+        };
 
-        // Theme changer
-        let currentThemeMode = 'dark';
-        
-        function changeTheme() {
-            const body = document.body;
-            const themeLabel = document.getElementById('current-theme');
-            
-            if (currentThemeMode === 'dark') {
-                // Switch to light
-                body.style.backgroundColor = '#f8fafc';
-                body.style.color = '#0f172a';
+        const assetNames = {
+            'EURUSD': 'EUR/USD',
+            'USDJPY': 'USD/JPY',
+            'XAUUSD': 'Gold',
+            'XAGUSD': 'Silver',
+            'SPX': 'S&P 500',
+            'NDX': 'Nasdaq',
+            'DXY': 'DXY'
+        };
+
+        // Render correlation table
+        function renderCorrelationTable() {
+            const tbody = document.getElementById('correlation-table');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const assets = Object.keys(correlationData);
+
+            assets.forEach(asset => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-zinc-800/50';
                 
-                // Update some elements
-                document.querySelectorAll('.bg-zinc-950').forEach(el => el.style.backgroundColor = '#ffffff');
-                document.querySelectorAll('.bg-zinc-900').forEach(el => el.style.backgroundColor = '#f1e7ff20');
-                document.querySelectorAll('.border-zinc-800').forEach(el => el.style.borderColor = '#e2e8f0');
+                let html = `<td class="text-left font-medium text-zinc-300">${assetNames[asset]}</td>`;
                 
-                if (themeLabel) themeLabel.textContent = 'Clair (modifié)';
-                if (themeLabel) themeLabel.style.color = '#6366f1';
-                currentThemeMode = 'light';
-            } else {
-                // Back to dark
-                location.reload(); // Simple way to reset for demo
-            }
-        }
+                assets.forEach(otherAsset => {
+                    const value = correlationData[asset][otherAsset];
+                    let colorClass = '';
+                    if (value > 0.6) colorClass = 'bg-emerald-500/20 text-emerald-400';
+                    else if (value > 0.3) colorClass = 'bg-emerald-500/10 text-emerald-300';
+                    else if (value > 0) colorClass = 'bg-emerald-500/5 text-emerald-200';
+                    else if (value > -0.3) colorClass = 'bg-rose-500/5 text-rose-200';
+                    else if (value > -0.6) colorClass = 'bg-rose-500/10 text-rose-300';
+                    else colorClass = 'bg-rose-500/20 text-rose-400';
 
-        // Simulate AI modifying the site
-        function simulateAIResponse() {
-            const btns = document.querySelectorAll('#demo button, #demo .cursor-pointer');
-            
-            const originalTexts = [];
-            btns.forEach((btn, i) => {
-                originalTexts[i] = btn.innerHTML;
-                btn.style.transition = 'all 0.3s ease';
-                btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> L'IA réfléchit...`;
-                btn.disabled = true;
-            });
-
-            setTimeout(() => {
-                btns.forEach((btn, i) => {
-                    btn.innerHTML = originalTexts[i];
-                    btn.disabled = false;
+                    html += `<td onclick="showCorrelationDetail('${asset}', '${otherAsset}', ${value})" class="correlation-cell font-mono text-sm ${colorClass} rounded">${value.toFixed(2)}</td>`;
                 });
                 
-                // Fun effect: add a success banner
-                const banner = document.createElement('div');
-                banner.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-6 py-3 rounded-3xl flex items-center gap-x-3 text-sm shadow-2xl z-[999]`;
-                banner.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <span>L'IA a ajouté une nouvelle section ! (simulation)</span>
-                `;
-                document.body.appendChild(banner);
-                
-                setTimeout(() => {
-                    banner.style.transition = 'all 0.4s ease';
-                    banner.style.opacity = '0';
-                    setTimeout(() => banner.remove(), 300);
-                }, 2800);
-            }, 1650);
+                row.innerHTML = html;
+                tbody.appendChild(row);
+            });
         }
 
-        // Deploy to Vercel function
-        function deployToVercel() {
-            const url = 'https://vercel.com/new/git?repository-url=https%3A%2F%2Fgithub.com%2Fadriengeyer02-bot%2Fdemo-site-grok-vercel';
-            window.open(url, '_blank');
-        }
-
-        // Contact me simulation
-        function contactMe() {
+        function showCorrelationDetail(asset1, asset2, value) {
             const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[999] p-6';
+            modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-6';
+            
+            let interpretation = '';
+            if (value > 0.6) interpretation = 'Forte corrélation positive : les deux actifs ont tendance à bouger dans le même sens.';
+            else if (value > 0.3) interpretation = 'Corrélation positive modérée.';
+            else if (value > 0) interpretation = 'Corrélation positive faible.';
+            else if (value > -0.3) interpretation = 'Corrélation négative faible.';
+            else if (value > -0.6) interpretation = 'Corrélation négative modérée.';
+            else interpretation = 'Forte corrélation négative : les deux actifs ont tendance à bouger en sens inverse.';
+
             modal.innerHTML = `
-                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full p-8">
-                    <div class="flex justify-between items-start mb-6">
+                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full p-7">
+                    <div class="flex justify-between items-start mb-5">
                         <div>
-                            <div class="font-semibold text-2xl tracking-tight">Parlons de ton projet</div>
-                            <div class="text-zinc-400 text-sm mt-1">Je peux créer n'importe quel site pour toi.</div>
+                            <div class="font-semibold text-lg">${assetNames[asset1]} vs ${assetNames[asset2]}</div>
+                            <div class="text-4xl font-display tracking-tighter mt-1 ${value >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${value.toFixed(2)}</div>
                         </div>
-                        <button onclick="this.closest('.fixed').remove()" class="text-zinc-400 hover:text-white text-2xl leading-none">&times;</button>
+                        <button onclick="this.closest('.fixed').remove()" class="text-2xl text-zinc-400 hover:text-white">&times;</button>
                     </div>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs text-zinc-400 block mb-1.5">Ton nom</label>
-                            <input type="text" value="Utilisateur Grok" class="w-full bg-zinc-950 border border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-xs text-zinc-400 block mb-1.5">Type de site souhaité</label>
-                            <input type="text" placeholder="Portfolio, Landing page, Blog..." class="w-full bg-zinc-950 border border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-xs text-zinc-400 block mb-1.5">Description rapide</label>
-                            <textarea class="w-full bg-zinc-950 border border-zinc-700 rounded-3xl px-4 py-3 text-sm h-24 focus:outline-none focus:border-indigo-500" placeholder="Je voudrais un site pour mon entreprise de..."></textarea>
-                        </div>
+                    <div class="text-sm text-zinc-300 leading-relaxed">
+                        ${interpretation}
                     </div>
 
-                    <button onclick="submitContactForm(this)" 
-                            class="mt-6 w-full py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-3xl flex items-center justify-center gap-x-2">
-                        <span>Envoyer ma demande à Grok</span>
-                    </button>
+                    <div class="mt-6 text-xs bg-zinc-950 border border-zinc-800 p-4 rounded-2xl">
+                        <strong class="text-zinc-400">Contexte macro :</strong><br>
+                        Cette corrélation s'explique souvent par les flux de capitaux, la force du dollar et les attentes de politique monétaire.
+                    </div>
+
+                    <div class="mt-5 text-[10px] text-zinc-500">Données illustratives • Période : 12 derniers mois</div>
                 </div>
             `;
             document.body.appendChild(modal);
         }
 
-        function submitContactForm(button) {
-            const originalText = button.innerHTML;
-            button.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Envoi en cours...`;
-            button.disabled = true;
-
+        // Asset selection (visual feedback)
+        let currentSelectedAsset = null;
+        function selectAsset(element, assetKey) {
+            // Deselect others
+            document.querySelectorAll('.asset-pill').forEach(el => el.classList.remove('active', 'border-indigo-500'));
+            element.classList.add('active', 'border-indigo-500');
+            
+            currentSelectedAsset = assetKey;
+            
+            // Scroll to correlations and highlight
+            document.getElementById('correlations').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
             setTimeout(() => {
-                button.closest('.fixed').remove();
-                
-                const toast = document.createElement('div');
-                toast.className = `fixed bottom-6 right-6 bg-zinc-900 border border-emerald-500/30 text-emerald-400 px-6 py-4 rounded-3xl flex items-center gap-x-3 shadow-2xl z-[999]`;
-                toast.innerHTML = `
-                    <i class="fas fa-check-circle text-emerald-400"></i>
-                    <div>
-                        <div class="font-medium text-white">Demande reçue !</div>
-                        <div class="text-xs text-emerald-300/70">Grok va te répondre très bientôt.</div>
-                    </div>
-                `;
-                document.body.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.style.transition = 'all .4s ease';
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.parentNode.removeChild(toast), 300);
-                }, 4200);
-            }, 1350);
+                // Highlight the row in correlation table
+                const rows = document.querySelectorAll('#correlation-table tr');
+                rows.forEach(row => {
+                    if (row.textContent.includes(assetNames[assetKey])) {
+                        row.style.transition = 'background 0.3s ease';
+                        row.style.background = 'rgba(99, 102, 241, 0.1)';
+                        setTimeout(() => {
+                            row.style.background = '';
+                        }, 1800);
+                    }
+                });
+            }, 600);
         }
 
-        // Keyboard shortcut hint
-        function addKeyboardHint() {
-            document.addEventListener('keydown', function(e) {
-                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
-                    e.preventDefault();
-                    const demoSection = document.getElementById('demo');
-                    if (demoSection) demoSection.scrollIntoView({ behavior: 'smooth' });
+        // AI Insights data
+        const insightsData = {
+            'dxy-gold': {
+                title: 'DXY vs Gold',
+                content: `Le dollar (DXY) et l'or ont historiquement une corrélation négative forte (-0.67 sur la période récente). 
+
+Lorsque le dollar s'affaiblit (baisse du DXY), l'or a tendance à monter car il devient moins cher pour les acheteurs étrangers et bénéficie souvent d'un environnement de taux bas ou de recherche de valeur refuge.
+
+Actuellement, avec un DXY en baisse et des attentes de poursuite de la détente monétaire de la Fed, l'environnement est structurellement favorable à l'or.`
+            },
+            'rates-nasdaq': {
+                title: 'Taux & Nasdaq',
+                content: `Les baisses de taux de la Fed ont généralement un impact positif sur les actions de croissance comme le Nasdaq. 
+
+Un environnement de taux plus bas réduit le coût du capital et augmente la valeur actualisée des flux futurs des entreprises technologiques. 
+
+Cependant, si les baisses de taux sont perçues comme une réponse à un ralentissement économique fort, l'effet peut être mitigé par la dégradation des perspectives de croissance.`
+            },
+            'inflation-forex': {
+                title: 'Inflation & Devises majeures',
+                content: `Une inflation américaine plus élevée que prévu renforce généralement le dollar (DXY) et pèse sur les paires comme EUR/USD.
+
+À l'inverse, une inflation qui se modère (comme observé récemment) peut soulager la pression sur la Fed et soutenir les devises non-USD, tout en étant positif pour les métaux précieux.`
+            },
+            'gold-silver': {
+                title: 'Gold vs Silver',
+                content: `L'or et l'argent ont une très forte corrélation positive (0.82). L'argent étant plus "industriel", il amplifie souvent les mouvements de l'or tout en étant plus volatil.
+
+Dans un scénario de reprise économique + taux bas, l'argent a historiquement surperformé l'or. Dans un scénario de risque extrême, l'or tend à mieux résister.`
+            }
+        };
+
+        function initInsightButtons() {
+            const container = document.getElementById('insight-buttons');
+            if (!container) return;
+            
+            const buttonsHTML = `
+                <button onclick="showInsight('dxy-gold')" class="px-5 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl transition-colors flex items-center gap-x-2">
+                    <i class="fas fa-link"></i> <span>DXY vs Gold</span>
+                </button>
+                <button onclick="showInsight('rates-nasdaq')" class="px-5 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl transition-colors flex items-center gap-x-2">
+                    <i class="fas fa-chart-line"></i> <span>Taux & Nasdaq</span>
+                </button>
+                <button onclick="showInsight('inflation-forex')" class="px-5 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl transition-colors flex items-center gap-x-2">
+                    <i class="fas fa-globe"></i> <span>Inflation & Forex</span>
+                </button>
+                <button onclick="showInsight('gold-silver')" class="px-5 py-2 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-2xl transition-colors flex items-center gap-x-2">
+                    <i class="fas fa-coins"></i> <span>Gold vs Silver</span>
+                </button>
+            `;
+            container.innerHTML = buttonsHTML;
+        }
+
+        let currentInsightKey = null;
+
+        function showInsight(key) {
+            const contentDiv = document.getElementById('insight-content');
+            const data = insightsData[key];
+            if (!data || !contentDiv) return;
+
+            currentInsightKey = key;
+
+            contentDiv.innerHTML = `
+                <div class="font-semibold text-lg mb-3 text-white">${data.title}</div>
+                <div class="text-sm leading-relaxed whitespace-pre-line">${data.content}</div>
+            `;
+
+            // Highlight active button
+            document.querySelectorAll('#insight-buttons button').forEach(btn => {
+                btn.classList.remove('!bg-indigo-600', '!border-indigo-500');
+                if (btn.textContent.includes(data.title.split(' ')[0])) {
+                    btn.classList.add('!bg-indigo-600', '!border-indigo-500');
                 }
             });
+        }
 
-            // Easter egg: press 'g' for grok
-            let keys = '';
-            document.addEventListener('keypress', function(e) {
-                keys += e.key;
-                if (keys.length > 5) keys = keys.slice(-5);
-                if (keys.toLowerCase() === 'grok!') {
-                    keys = '';
-                    const hero = document.getElementById('accueil');
-                    if (hero) {
-                        hero.style.transition = 'all 0.6s cubic-bezier(0.23, 1.0, 0.32, 1)';
-                        hero.style.transform = 'scale(0.96)';
-                        setTimeout(() => {
-                            hero.style.transform = 'scale(1)';
-                        }, 600);
+        function regenerateInsight() {
+            const contentDiv = document.getElementById('insight-content');
+            if (!currentInsightKey || !contentDiv) {
+                // Pick random
+                const keys = Object.keys(insightsData);
+                currentInsightKey = keys[Math.floor(Math.random() * keys.length)];
+            }
+
+            const data = insightsData[currentInsightKey];
+            contentDiv.style.transition = 'opacity 0.2s ease';
+            contentDiv.style.opacity = '0.3';
+
+            setTimeout(() => {
+                contentDiv.innerHTML = `
+                    <div class="font-semibold text-lg mb-3 text-white">${data.title}</div>
+                    <div class="text-sm leading-relaxed whitespace-pre-line">${data.content}</div>
+                `;
+                contentDiv.style.opacity = '1';
+            }, 220);
+        }
+
+        // Refresh data simulation
+        function refreshData() {
+            const btns = document.querySelectorAll('button');
+            btns.forEach(b => b.disabled = true);
+
+            // Simulate update
+            setTimeout(() => {
+                // Slight random variation on metrics for demo
+                document.querySelectorAll('.macro-value').forEach(el => {
+                    if (el.textContent.includes('%') || el.textContent.includes('.')) {
+                        const current = parseFloat(el.textContent);
+                        if (!isNaN(current)) {
+                            const variation = (Math.random() - 0.5) * 0.15;
+                            el.textContent = (current + variation).toFixed(2) + (el.textContent.includes('%') ? '%' : '');
+                        }
                     }
+                });
+
+                // Re-render correlations with slight noise
+                renderCorrelationTable();
+
+                btns.forEach(b => b.disabled = false);
+
+                // Toast
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-6 right-6 bg-zinc-900 border border-emerald-500/30 text-emerald-400 px-5 py-3 rounded-3xl text-sm flex items-center gap-x-3 shadow-xl z-[200]';
+                toast.innerHTML = `<i class="fas fa-check-circle"></i> <span>Données actualisées</span>`;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.transition = 'all 0.3s ease';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 200);
+                }, 2200);
+            }, 650);
+        }
+
+        // Keyboard shortcuts
+        function initKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key.toLowerCase() === 'r' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    refreshData();
+                }
+                if (e.key === '?') {
+                    e.preventDefault();
+                    const insights = document.getElementById('insights');
+                    if (insights) insights.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         }
 
         // Initialize everything
-        function init() {
-            initializeTailwind();
-            addKeyboardHint();
-            
-            // Random nice touch: animate stats on scroll into view
-            const statsSection = document.querySelector('.border-b.border-zinc-800');
-            if (statsSection) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            animateStats();
-                            observer.disconnect();
-                        }
-                    });
-                });
-                observer.observe(statsSection);
-            }
+        function initDashboard() {
+            initTailwind();
+            initMobileMenu();
+            renderCorrelationTable();
+            initInsightButtons();
+            initKeyboardShortcuts();
 
-            // Console message for devs
-            console.log('%c[Gro kWeb] Site créé par Grok via GitHub + Vercel tools. Tu peux modifier ce code directement sur GitHub !', 'color:#64748b; font-size: 9px');
-        }
+            // Show first insight by default
+            setTimeout(() => {
+                const firstBtn = document.querySelector('#insight-buttons button');
+                if (firstBtn) {
+                    firstBtn.click();
+                }
+            }, 800);
 
-        function animateStats() {
-            const numbers = document.querySelectorAll('.stat-number');
-            numbers.forEach(num => {
-                const target = num.textContent;
-                if (target.includes('<')) return;
-                
-                const finalValue = parseFloat(target);
-                let current = 0;
-                const duration = 1400;
-                const startTime = Date.now();
-
-                const timer = setInterval(() => {
-                    const progress = Math.min((Date.now() - startTime) / duration, 1);
-                    const eased = 1 - Math.pow(1 - progress, 3);
-                    
-                    if (target === '98') {
-                        current = Math.floor(eased * finalValue);
-                        num.textContent = current;
-                    } else if (target === '4.9') {
-                        current = (eased * finalValue).toFixed(1);
-                        num.textContent = current;
+            // Easter egg: press 'm' for macro
+            let keys = '';
+            document.addEventListener('keypress', function(e) {
+                keys += e.key.toLowerCase();
+                if (keys.length > 4) keys = keys.slice(-4);
+                if (keys === 'macro') {
+                    keys = '';
+                    const header = document.querySelector('h1');
+                    if (header) {
+                        header.style.transition = 'all 0.6s cubic-bezier(0.23,1,0.32,1)';
+                        header.style.transform = 'scale(1.03)';
+                        setTimeout(() => header.style.transform = 'scale(1)', 650);
                     }
-                    
-                    if (progress === 1) clearInterval(timer);
-                }, 40);
+                }
             });
+
+            console.log('%c[MacroLink] Dashboard initialisé. Version MVP construite avec Grok.', 'color:#64748b');
         }
 
-        // Boot the app
-        window.onload = init;
+        window.onload = initDashboard;
     </script>
 </body>
 </html>
