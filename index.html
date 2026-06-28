@@ -54,7 +54,7 @@
                 <div class="hidden md:flex items-center gap-x-3">
                     <div class="flex items-center gap-x-2 text-xs bg-zinc-900 border border-zinc-700 rounded-2xl px-3 py-1">
                         <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                        <span class="text-emerald-400 font-medium">Données • 28 juin 2026</span>
+                        <span class="text-emerald-400 font-medium" id="last-updated">Données • 28 juin 2026</span>
                     </div>
                     <button onclick="refreshData()" class="flex items-center gap-x-2 px-5 py-2 text-sm font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl transition-all active:scale-[0.985]">
                         <i class="fas fa-sync-alt text-xs"></i>
@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <!-- Chart - FIXED -->
+    <!-- Chart -->
     <div class="max-w-7xl mx-auto px-6 pb-10">
         <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
             <div class="flex items-center justify-between mb-4">
@@ -379,15 +379,29 @@
                 data: { labels: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep'], datasets: [{ label: 'Corrélation DXY-Gold', data: [-0.58,-0.65,-0.71,-0.68,-0.74,-0.69,-0.67,-0.71,-0.67], borderColor: '#c026ff', borderWidth: 2.5, tension: 0.4, fill: true, backgroundColor: 'rgba(192,38,255,0.08)' }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: -1, max: 0, ticks: { stepSize: 0.2 } } } }
             });
-            // Force render
-            setTimeout(() => { if (trendChart) trendChart.resize(); }, 100);
+            setTimeout(() => { if (trendChart) trendChart.resize(); }, 80);
         }
 
         function refreshData() {
-            assetsList.forEach(a => { a.change = parseFloat((a.change + (Math.random()-0.5)*0.6).toFixed(2)); });
-            renderAssets();
-            if (trendChart) { trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => Math.max(-0.9, Math.min(-0.45, v + (Math.random()-0.5)*0.03))); trendChart.update(); }
-            const t = document.createElement('div'); t.className = 'fixed bottom-6 right-6 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 px-5 py-3 rounded-3xl text-sm flex items-center gap-x-3 z-50'; t.innerHTML = '<i class="fas fa-check-circle"></i> <span>Données actualisées</span>'; document.body.appendChild(t); setTimeout(()=>t.remove(), 2000);
+            // On ne change PLUS les prix des actifs de façon visible (trop perturbant)
+            // On met seulement à jour l'heure + on rafraîchit légèrement le graphique
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('last-updated').innerHTML = `Données • ${timeStr}`;
+
+            // Rafraîchit légèrement le graphique de corrélation
+            if (trendChart) {
+                trendChart.data.datasets[0].data = trendChart.data.datasets[0].data.map(v => 
+                    Math.max(-0.88, Math.min(-0.48, v + (Math.random() - 0.5) * 0.025))
+                );
+                trendChart.update();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 px-5 py-3 rounded-3xl text-sm flex items-center gap-x-3 z-50';
+            toast.innerHTML = '<i class="fas fa-check-circle"></i> <span>Graphique mis à jour</span>';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1800);
         }
 
         function initDashboard() {
@@ -400,7 +414,7 @@
             initTrendChart();
             ['EURUSD','XAUUSD','SPX','DXY'].forEach(id => selectedAssets.add(id));
             renderAssets(); updatePortfolioBuilder();
-            console.log('%c[MacroLink] Chart corrigé et forcé.', 'color:#22c55e');
+            console.log('%c[MacroLink] Actualiser maintenant plus doux (ne change plus les prix).', 'color:#22c55e');
         }
         window.onload = initDashboard;
     </script>
