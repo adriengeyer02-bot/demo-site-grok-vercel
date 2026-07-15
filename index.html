@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MacroLink — terminal macro multi-actifs, scénarios et portefeuille.">
+    <title>MacroLink — Macro Intelligence Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            color-scheme: dark;
+            --ink: #05060a;
+            --panel: #0d1018;
+            --panel-soft: #111622;
+            --line: rgba(255,255,255,.085);
+            --muted: #8c95a8;
+            --brand: #7c6cff;
+            --cyan: #24d3ee;
+            --green: #36d399;
+            --red: #fb7185;
+            --amber: #fbbf24;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background:
+                radial-gradient(circle at 15% -5%, rgba(124,108,255,.17), transparent 30rem),
+                radial-gradient(circle at 92% 18%, rgba(36,211,238,.08), transparent 28rem),
+                var(--ink);
+            color: #edf0f7;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: .18;
+            background-image: linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black, transparent 75%);
+        }
+        .font-display { font-family: "Space Grotesk", sans-serif; }
+        .font-mono { font-family: "DM Mono", monospace; }
+        .container-shell { width: min(1480px, calc(100% - 32px)); margin-inline: auto; }
+        .section-space { padding-top: 86px; scroll-margin-top: 76px; }
+        .panel {
+            background: linear-gradient(145deg, rgba(17,22,34,.96), rgba(10,13,20,.96));
+            border: 1px solid var(--line);
+            box-shadow: 0 22px 60px rgba(0,0,0,.22);
+        }
+        .soft-panel { background: rgba(255,255,255,.025); border: 1px solid var(--line); }
+        .glass { background: rgba(5,6,10,.76); backdrop-filter: blur(18px); }
+        .lift { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+        .lift:hover { transform: translateY(-3px); border-color: rgba(124,108,255,.4); box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+        .nav-link { color: #929bad; transition: color .2s ease, background .2s ease; }
+        .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,.055); }
+        .eyebrow { letter-spacing: .18em; text-transform: uppercase; font-size: .68rem; font-weight: 700; color: #9ca4b6; }
+        .gradient-text { background: linear-gradient(100deg, #ffffff 15%, #a99eff 55%, #55dff4); color: transparent; background-clip: text; }
+        .metric-value { font-family: "Space Grotesk", sans-serif; font-size: clamp(1.55rem, 2vw, 2.05rem); letter-spacing: -.06em; line-height: 1; }
+        .chip { border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+        .chip.active { color: white; background: rgba(124,108,255,.18); border-color: rgba(124,108,255,.65); }
+        .category-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+        .asset-row { transition: background .16s ease, border-color .16s ease; }
+        .asset-row:hover { background: rgba(255,255,255,.035); }
+        .starred { color: #fbbf24 !important; }
+        .heat-cell { transition: transform .12s ease, filter .12s ease; cursor: pointer; min-width: 58px; }
+        .heat-cell:hover { transform: scale(1.06); filter: brightness(1.3); position: relative; z-index: 4; }
+        .scenario-card.active { border-color: rgba(124,108,255,.9); background: linear-gradient(145deg, rgba(124,108,255,.18), rgba(17,22,34,.96)); }
+        .range { accent-color: var(--brand); }
+        .modal-backdrop { animation: fade-in .16s ease; }
+        .modal-card { animation: rise-in .2s ease; }
+        .toast { animation: toast-in .25s ease; }
+        .pulse-ring { box-shadow: 0 0 0 0 rgba(54,211,153,.45); animation: pulse-ring 2.2s infinite; }
+        .scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,.025); }
+        .scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); border-radius: 20px; }
+        .signal-line::after { content: ""; position: absolute; left: 17px; top: 35px; bottom: -19px; width: 1px; background: var(--line); }
+        .signal-line:last-child::after { display: none; }
+        @keyframes fade-in { from { opacity: 0; } }
+        @keyframes rise-in { from { opacity: 0; transform: translateY(12px) scale(.985); } }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
+        @keyframes pulse-ring { 70% { box-shadow: 0 0 0 8px rgba(54,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(54,211,153,0); } }
+        @media (max-width: 767px) {
+            .container-shell { width: min(100% - 22px, 1480px); }
+            .section-space { padding-top: 64px; }
+            .hide-mobile { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="fixed inset-x-0 top-0 z-50 glass border-b border-white/[.07]">
+        <div class="container-shell h-[68px] flex items-center gap-5">
+            <a href="#top" class="flex items-center gap-3 shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <span class="font-display text-lg font-bold">M</span>
+                </div>
+                <div>
+                    <div class="font-display text-lg font-semibold tracking-tight leading-none">MacroLink</div>
+                    <div class="text-[8px] text-zinc-500 tracking-[.26em] mt-1">INTELLIGENCE TERMINAL</div>
+                </div>
+            </a>
+
+            <div class="hidden xl:flex items-center gap-1 mx-auto text-xs font-semibold">
+                <a class="nav-link rounded-xl px-3 py-2" href="#radar">Radar</a>
+                <a class="nav-link rounded-xl px-3 py-2" href="#assets">Univers</a>
+                <a class="nav-link rounded-xl px-3 py-2" href="#correlations">Relations</a>
+                <a class="nav-link rounded-xl px-3 py-2" href="#scenarios">Scénarios</a>
+                <a class="nav-link rounded-xl px-3 py-2" href="#portfolio">Portefeuille</a>
+                <a class="nav-link rounded-xl px-3 py-2" href="#insights">Briefing</a>
+            </div>
+
+            <div class="ml-auto flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2 chip rounded-xl px-3 py-2 text-[10px]">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-ring"></span>
+                    <span class="text-zinc-400">MODE</span>
+                    <span class="text-emerald-300 font-semibold">DÉMO LIVE</span>
+                </div>
+                <button id="refresh-btn" class="chip rounded-xl px-3.5 py-2 text-xs hover:bg-white/[.07] transition flex items-center gap-2" type="button">
+                    <i class="fa-solid fa-rotate text-[10px]"></i><span class="hidden sm:inline">Actualiser</span>
+                </button>
+                <button id="mobile-menu-btn" class="xl:hidden chip rounded-xl w-10 h-10" type="button" aria-label="Ouvrir le menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden xl:hidden border-t border-white/[.07] px-4 py-3">
+            <div class="container-shell grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+                <a class="chip rounded-xl px-3 py-2" href="#radar">Radar</a>
+                <a class="chip rounded-xl px-3 py-2" href="#assets">Univers</a>
+                <a class="chip rounded-xl px-3 py-2" href="#correlations">Relations</a>
+                <a class="chip rounded-xl px-3 py-2" href="#scenarios">Scénarios</a>
+                <a class="chip rounded-xl px-3 py-2" href="#portfolio">Portefeuille</a>
+                <a class="chip rounded-xl px-3 py-2" href="#insights">Briefing</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="top" class="pt-[68px]">
+        <header class="container-shell pt-12 lg:pt-20">
+            <div class="grid xl:grid-cols-[1.25fr_.75fr] gap-8 items-stretch">
+                <div class="py-5 lg:py-10">
+                    <div class="flex flex-wrap items-center gap-2 mb-7">
+                        <span class="eyebrow text-indigo-300">Cockpit macro multi-actifs</span>
+                        <span class="chip rounded-full px-2.5 py-1 text-[9px] text-zinc-400">56 ACTIFS</span>
+                        <span class="chip rounded-full px-2.5 py-1 text-[9px] text-zinc-400">8 SCÉNARIOS</span>
+                        <span class="chip rounded-full px-2.5 py-1 text-[9px] text-zinc-400">7 CLASSES</span>
+                    </div>
+                    <h1 class="font-display text-5xl sm:text-7xl lg:text-[88px] leading-[.92] tracking-[-.065em] max-w-4xl">
+                        Comprendre le marché <span class="gradient-text">comme un système.</span>
+                    </h1>
+                    <p class="mt-7 text-base sm:text-xl text-zinc-400 leading-relaxed max-w-2xl">
+                        Reliez régimes, facteurs, actifs et positions dans une seule interface. Explorez les transmissions macro avant qu'elles ne deviennent évidentes.
+                    </p>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <a href="#assets" class="rounded-2xl bg-white text-zinc-950 px-6 py-3 text-sm font-semibold hover:bg-zinc-200 transition">
+                            Explorer l'univers <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                        </a>
+                        <a href="#scenarios" class="chip rounded-2xl px-6 py-3 text-sm font-semibold hover:bg-white/[.07] transition">
+                            Lancer un stress test
+                        </a>
+                    </div>
+                </div>
+
+                <div class="panel rounded-[30px] p-6 lg:p-8 relative overflow-hidden">
+                    <div class="absolute -right-20 -top-20 w-56 h-56 rounded-full bg-indigo-500/20 blur-3xl"></div>
+                    <div class="relative">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="eyebrow">Market pulse</div>
+                                <div class="font-display text-2xl mt-2">Risk-on sélectif</div>
+                            </div>
+                            <div class="w-16 h-16 rounded-full border border-emerald-400/30 bg-emerald-400/10 flex items-center justify-center">
+                                <span class="font-display text-xl text-emerald-300">67</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 h-2 bg-white/[.06] rounded-full overflow-hidden">
+                            <div class="h-full w-[67%] bg-gradient-to-r from-indigo-500 via-violet-400 to-emerald-400 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-zinc-500 mt-2 tracking-widest"><span>DÉFENSIF</span><span>EXPANSIF</span></div>
+
+                        <div id="hero-signals" class="mt-8 space-y-3"></div>
+                        <div class="mt-7 pt-5 border-t border-white/[.07] flex items-center justify-between text-xs">
+                            <span class="text-zinc-500">Dernier recalcul</span>
+                            <span id="last-update" class="font-mono text-zinc-300">15:42:18</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section id="radar" class="section-space container-shell">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">01 — Radar global</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">Le régime en un regard</h2>
+                    <p class="text-zinc-500 mt-2">Indicateurs illustratifs pour démontrer le fonctionnement du terminal.</p>
+                </div>
+                <div class="chip rounded-xl px-3 py-2 text-[10px] text-zinc-400">
+                    <i class="fa-solid fa-circle-info mr-1.5 text-indigo-300"></i> Données simulées — pas de conseil financier
+                </div>
+            </div>
+
+            <div id="macro-metrics" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3"></div>
+
+            <div class="grid lg:grid-cols-12 gap-5 mt-5">
+                <div class="panel rounded-[28px] p-5 sm:p-7 lg:col-span-5">
+                    <div class="flex items-start justify-between mb-5">
+                        <div>
+                            <div class="eyebrow">Regime compass</div>
+                            <h3 class="font-display text-xl mt-1.5">Empreinte macro</h3>
+                        </div>
+                        <span class="chip rounded-full px-2.5 py-1 text-[9px] text-cyan-300">TEMPS RÉEL SIMULÉ</span>
+                    </div>
+                    <div class="h-[310px]"><canvas id="regime-chart"></canvas></div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-7 lg:col-span-4">
+                    <div class="eyebrow">Facteurs dominants</div>
+                    <h3 class="font-display text-xl mt-1.5 mb-6">Pressions du système</h3>
+                    <div id="factor-pulse" class="space-y-5"></div>
+                    <div class="soft-panel rounded-2xl p-4 mt-7 text-xs text-zinc-400 leading-relaxed">
+                        <span class="text-white font-semibold">Lecture :</span> la croissance reste constructive, mais la liquidité et le dollar produisent des signaux contradictoires.
+                    </div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-7 lg:col-span-3">
+                    <div class="eyebrow">Chaîne causale</div>
+                    <h3 class="font-display text-xl mt-1.5 mb-6">Narratif dominant</h3>
+                    <div id="causal-chain" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assets" class="section-space container-shell">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">02 — Univers multi-actifs</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">56 instruments, une même grille de lecture</h2>
+                    <p class="text-zinc-500 mt-2">Filtrez, comparez et épinglez les actifs utilisés dans le portefeuille et les scénarios.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <div id="asset-result-count" class="font-display text-2xl">56</div>
+                        <div class="text-[9px] text-zinc-500 uppercase tracking-widest">résultats</div>
+                    </div>
+                    <div class="h-9 w-px bg-white/[.08]"></div>
+                    <div class="text-right">
+                        <div id="selected-count" class="font-display text-2xl text-amber-300">6</div>
+                        <div class="text-[9px] text-zinc-500 uppercase tracking-widest">épinglés</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel rounded-[28px] overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-white/[.07]">
+                    <div class="flex flex-col xl:flex-row gap-3 xl:items-center">
+                        <div class="relative xl:w-80">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 text-xs"></i>
+                            <input id="asset-search" type="search" placeholder="Ticker, actif, région…" class="w-full bg-black/25 border border-white/[.08] rounded-2xl pl-10 pr-4 py-3 text-sm outline-none focus:border-indigo-400/60">
+                        </div>
+                        <div id="category-filters" class="flex gap-2 overflow-x-auto scrollbar pb-1 xl:pb-0"></div>
+                        <div class="xl:ml-auto flex gap-2">
+                            <select id="asset-sort" class="bg-black/25 border border-white/[.08] rounded-xl px-3 py-2.5 text-xs outline-none">
+                                <option value="name">Trier : nom</option>
+                                <option value="change-desc">Performance ↓</option>
+                                <option value="change-asc">Performance ↑</option>
+                                <option value="vol-desc">Volatilité</option>
+                            </select>
+                            <button id="clear-stars" class="chip rounded-xl px-3 py-2 text-xs" type="button">Vider</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto scrollbar">
+                    <table class="w-full min-w-[980px] text-sm">
+                        <thead class="text-[9px] uppercase tracking-[.15em] text-zinc-500 bg-black/20">
+                            <tr>
+                                <th class="text-left px-5 py-4 w-12"></th>
+                                <th class="text-left px-3 py-4">Instrument</th>
+                                <th class="text-left px-3 py-4">Classe</th>
+                                <th class="text-right px-3 py-4">Dernier</th>
+                                <th class="text-right px-3 py-4">24 h</th>
+                                <th class="text-right px-3 py-4">Vol. 30 j</th>
+                                <th class="text-left px-3 py-4">Signal</th>
+                                <th class="text-left px-3 py-4">Driver dominant</th>
+                                <th class="px-5 py-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="asset-table"></tbody>
+                    </table>
+                </div>
+                <div id="asset-empty" class="hidden text-center py-16 text-zinc-500">Aucun actif ne correspond à cette recherche.</div>
+            </div>
+        </section>
+
+        <section id="correlations" class="section-space container-shell">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">03 — Moteur de relations</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">Voir ce qui bouge ensemble — et pourquoi</h2>
+                    <p class="text-zinc-500 mt-2">Matrice factorielle illustrative. Cliquez une cellule pour ouvrir l'explication.</p>
+                </div>
+                <button id="export-csv" class="chip rounded-2xl px-4 py-3 text-xs font-semibold hover:bg-white/[.07]" type="button">
+                    <i class="fa-solid fa-download mr-2"></i>Exporter la matrice
+                </button>
+            </div>
+
+            <div class="grid xl:grid-cols-12 gap-5">
+                <div class="panel rounded-[28px] xl:col-span-8 overflow-hidden">
+                    <div class="p-5 border-b border-white/[.07] flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+                        <div id="matrix-presets" class="flex gap-2 overflow-x-auto scrollbar"></div>
+                        <div class="flex gap-1 text-[9px]">
+                            <span class="rounded px-2 py-1 bg-rose-500/20 text-rose-300">-1</span>
+                            <span class="rounded px-2 py-1 bg-white/[.04] text-zinc-500">0</span>
+                            <span class="rounded px-2 py-1 bg-emerald-500/20 text-emerald-300">+1</span>
+                        </div>
+                    </div>
+                    <div class="overflow-auto scrollbar max-h-[650px] p-4">
+                        <table id="correlation-matrix" class="w-full text-xs"></table>
+                    </div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-6 xl:col-span-4">
+                    <div class="eyebrow">Pair lab</div>
+                    <div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-center mt-4">
+                        <select id="pair-a" class="w-full bg-black/25 border border-white/[.08] rounded-xl px-3 py-2.5 text-xs"></select>
+                        <span class="text-zinc-600 text-xs">VS</span>
+                        <select id="pair-b" class="w-full bg-black/25 border border-white/[.08] rounded-xl px-3 py-2.5 text-xs"></select>
+                    </div>
+                    <div class="flex items-end justify-between mt-6">
+                        <div>
+                            <div class="text-[10px] text-zinc-500 uppercase tracking-widest">Corrélation factorielle</div>
+                            <div id="pair-correlation" class="font-display text-5xl tracking-tighter mt-1">-0.67</div>
+                        </div>
+                        <div id="pair-label" class="text-xs text-right text-zinc-400"></div>
+                    </div>
+                    <div class="h-[230px] mt-5"><canvas id="pair-chart"></canvas></div>
+                    <div id="pair-drivers" class="soft-panel rounded-2xl p-4 mt-5 text-xs text-zinc-400 leading-relaxed"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="scenarios" class="section-space container-shell">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">04 — Scenario engine</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">Transformer une hypothèse en impacts</h2>
+                    <p class="text-zinc-500 mt-2">Choisissez un choc, réglez son intensité et suivez sa propagation entre facteurs et actifs.</p>
+                </div>
+                <div class="panel rounded-2xl px-4 py-3 min-w-[280px]">
+                    <div class="flex justify-between text-xs mb-2"><span class="text-zinc-400">Intensité du choc</span><span id="severity-label" class="font-mono text-indigo-300">100%</span></div>
+                    <input id="severity-range" class="range w-full" type="range" min="50" max="200" value="100" step="10">
+                </div>
+            </div>
+
+            <div id="scenario-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
+            <div class="grid xl:grid-cols-12 gap-5 mt-5">
+                <div class="panel rounded-[28px] p-5 sm:p-7 xl:col-span-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="eyebrow">Scénario actif</div>
+                            <h3 id="scenario-title" class="font-display text-2xl mt-2"></h3>
+                            <p id="scenario-subtitle" class="text-sm text-zinc-400 mt-2"></p>
+                        </div>
+                        <div id="scenario-icon" class="w-11 h-11 rounded-2xl bg-indigo-500/10 text-indigo-300 flex items-center justify-center"></div>
+                    </div>
+                    <p id="scenario-explanation" class="text-sm text-zinc-300 leading-relaxed mt-6"></p>
+                    <div class="mt-7">
+                        <div class="text-[9px] uppercase tracking-widest text-zinc-500 mb-4">Transmission</div>
+                        <div id="scenario-transmission" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-7 xl:col-span-8">
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <div class="eyebrow">Impact cross-asset</div>
+                            <h3 class="font-display text-xl mt-1.5">Sensibilités estimées</h3>
+                        </div>
+                        <button id="apply-scenario" class="rounded-xl bg-indigo-500 hover:bg-indigo-400 px-4 py-2.5 text-xs font-semibold transition" type="button">
+                            Appliquer au portefeuille
+                        </button>
+                    </div>
+                    <div id="scenario-impact-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="section-space container-shell">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">05 — Portfolio stress lab</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">Du marché à vos positions</h2>
+                    <p class="text-zinc-500 mt-2">Construisez un portefeuille long/short, mesurez les facteurs cachés et appliquez les scénarios.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="equal-weight" class="chip rounded-xl px-3.5 py-2.5 text-xs" type="button">Équipondérer</button>
+                    <button id="reset-portfolio" class="chip rounded-xl px-3.5 py-2.5 text-xs" type="button">Réinitialiser</button>
+                </div>
+            </div>
+
+            <div class="grid xl:grid-cols-12 gap-5">
+                <div class="panel rounded-[28px] overflow-hidden xl:col-span-7">
+                    <div class="p-5 border-b border-white/[.07] flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+                        <div>
+                            <div class="font-semibold">Positions</div>
+                            <div class="text-[10px] text-zinc-500 mt-1">Les actifs épinglés alimentent automatiquement cette liste.</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select id="portfolio-add-select" class="bg-black/25 border border-white/[.08] rounded-xl px-3 py-2 text-xs max-w-[190px]"></select>
+                            <button id="portfolio-add-btn" class="rounded-xl bg-white text-black px-3 py-2 text-xs font-semibold" type="button">Ajouter</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto scrollbar">
+                        <table class="w-full min-w-[700px] text-sm">
+                            <thead class="text-[9px] uppercase tracking-widest text-zinc-500 bg-black/20">
+                                <tr><th class="text-left px-5 py-3">Actif</th><th class="px-3">Sens</th><th class="text-left px-3">Allocation</th><th class="text-right px-3">Scénario</th><th class="px-5"></th></tr>
+                            </thead>
+                            <tbody id="portfolio-rows"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-5 border-t border-white/[.07] flex flex-wrap items-center justify-between gap-3 text-xs">
+                        <span class="text-zinc-500">Allocation brute</span>
+                        <div class="flex items-center gap-4">
+                            <span id="allocation-warning" class="text-amber-300"></span>
+                            <span id="total-allocation" class="font-display text-xl">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-7 xl:col-span-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="eyebrow">Résultat du stress</div>
+                            <div id="portfolio-scenario-name" class="font-display text-xl mt-1.5">Détente monétaire</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[9px] text-zinc-500 uppercase tracking-widest">Impact estimé</div>
+                            <div id="portfolio-impact" class="font-display text-4xl tracking-tighter mt-1">+0.0%</div>
+                        </div>
+                    </div>
+                    <div id="portfolio-impact-bars" class="mt-7 space-y-3"></div>
+                    <div class="mt-8 pt-6 border-t border-white/[.07]">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="font-semibold text-sm">Expositions factorielles</div>
+                            <div class="text-[9px] text-zinc-500 uppercase tracking-widest">nettes</div>
+                        </div>
+                        <div id="portfolio-factors" class="grid grid-cols-2 gap-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="insights" class="section-space container-shell pb-24">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+                <div>
+                    <div class="eyebrow text-indigo-300">06 — Macro briefing</div>
+                    <h2 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">Une lecture exploitable, pas un flux de bruit</h2>
+                    <p class="text-zinc-500 mt-2">Thèses, signaux contradictoires, niveaux de confiance et points d'invalidation.</p>
+                </div>
+                <button id="regenerate-insight" class="chip rounded-2xl px-4 py-3 text-xs font-semibold" type="button">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2 text-indigo-300"></i>Nouvelle synthèse
+                </button>
+            </div>
+
+            <div class="grid xl:grid-cols-12 gap-5">
+                <div class="panel rounded-[28px] overflow-hidden xl:col-span-8">
+                    <div id="insight-tabs" class="flex gap-1 overflow-x-auto scrollbar p-3 border-b border-white/[.07]"></div>
+                    <div class="p-6 sm:p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div>
+                                <div id="insight-kicker" class="eyebrow text-indigo-300"></div>
+                                <h3 id="insight-title" class="font-display text-2xl sm:text-3xl mt-2"></h3>
+                            </div>
+                            <div class="soft-panel rounded-2xl p-3 min-w-[150px]">
+                                <div class="flex justify-between text-[9px] uppercase tracking-widest text-zinc-500"><span>Confiance</span><span id="insight-confidence-label"></span></div>
+                                <div class="h-1.5 bg-white/[.06] rounded-full mt-2 overflow-hidden"><div id="insight-confidence-bar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full"></div></div>
+                            </div>
+                        </div>
+                        <p id="insight-summary" class="text-zinc-300 leading-relaxed mt-7"></p>
+                        <div class="grid md:grid-cols-3 gap-3 mt-7">
+                            <div class="soft-panel rounded-2xl p-4"><div class="eyebrow">Catalyseur</div><div id="insight-catalyst" class="text-sm mt-2 leading-relaxed"></div></div>
+                            <div class="soft-panel rounded-2xl p-4"><div class="eyebrow">Expression</div><div id="insight-expression" class="text-sm mt-2 leading-relaxed"></div></div>
+                            <div class="soft-panel rounded-2xl p-4"><div class="eyebrow">Invalidation</div><div id="insight-invalidation" class="text-sm mt-2 leading-relaxed"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel rounded-[28px] p-5 sm:p-6 xl:col-span-4">
+                    <div class="flex items-center justify-between mb-5">
+                        <div><div class="eyebrow">Signal stack</div><h3 class="font-display text-xl mt-1.5">À surveiller</h3></div>
+                        <span class="text-[9px] text-zinc-500 uppercase tracking-widest">priorité</span>
+                    </div>
+                    <div id="watch-signals" class="space-y-5"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-white/[.07] bg-black/30">
+        <div class="container-shell py-8 flex flex-col md:flex-row gap-5 md:items-center justify-between text-xs text-zinc-500">
+            <div><span class="font-display text-white">MacroLink</span> — prototype éducatif multi-actifs.</div>
+            <div class="flex flex-wrap gap-4">
+                <span>56 actifs</span><span>8 scénarios</span><span>Matrice factorielle</span><span>Aucune donnée réelle</span>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-root"></div>
+    <div id="toast-root" class="fixed bottom-5 right-5 z-[100] space-y-2"></div>
+
+    <script>
+        const factorKeys = ["usd", "rates", "growth", "inflation", "risk", "china", "oil", "crypto"];
+        const factorLabels = {
+            usd: "Dollar", rates: "Taux", growth: "Croissance", inflation: "Inflation",
+            risk: "Appétit risque", china: "Chine", oil: "Pétrole", crypto: "Crypto"
+        };
+        const categoryMeta = {
+            "FX": { label: "Devises", color: "#55dff4", icon: "fa-coins" },
+            "Indices": { label: "Indices", color: "#8b7cff", icon: "fa-chart-line" },
+            "Rates": { label: "Taux", color: "#60a5fa", icon: "fa-building-columns" },
+            "Commodities": { label: "Matières", color: "#fbbf24", icon: "fa-gem" },
+            "Crypto": { label: "Crypto", color: "#f59e0b", icon: "fa-bitcoin-sign" },
+            "Credit": { label: "Crédit", color: "#36d399", icon: "fa-layer-group" },
+            "Volatility": { label: "Volatilité", color: "#fb7185", icon: "fa-wave-square" }
+        };
+
+        function asset(id, ticker, name, category, region, price, change, vol, signal, driver, factors, decimals, suffix) {
+            return { id, ticker, name, category, region, price, change, vol, signal, driver, factors, decimals: decimals == null ? 2 : decimals, suffix: suffix || "" };
+        }
+
+        const assets = [
+            asset("DXY","DXY","Dollar Index","FX","États-Unis",103.85,-0.55,6.4,"Baissier","Différentiel de taux",{usd:1,rates:.55,growth:.05,inflation:.25,risk:-.28},2),
+            asset("EURUSD","EUR/USD","Euro / Dollar","FX","Europe / US",1.085,.42,7.1,"Constructif","Écart BCE–Fed",{usd:-.95,rates:-.42,growth:.22,inflation:-.1,risk:.16},4),
+            asset("USDJPY","USD/JPY","Dollar / Yen","FX","Japon / US",148.65,-.31,9.8,"Neutre","Taux réels US",{usd:.62,rates:.82,growth:.08,inflation:.08,risk:.35},2),
+            asset("GBPUSD","GBP/USD","Livre / Dollar","FX","Royaume-Uni / US",1.272,.28,8.2,"Constructif","BoE vs Fed",{usd:-.82,rates:-.31,growth:.28,inflation:-.08,risk:.2},4),
+            asset("AUDUSD","AUD/USD","Dollar australien","FX","Australie / US",.632,.55,10.4,"Haussier","Chine + métaux",{usd:-.72,rates:-.18,growth:.52,risk:.65,china:.88},4),
+            asset("USDCAD","USD/CAD","Dollar / CAD","FX","Canada / US",1.378,-.19,7.6,"Baissier","Pétrole + BoC",{usd:.68,rates:.24,growth:-.08,risk:-.12,oil:-.62},4),
+            asset("USDCHF","USD/CHF","Dollar / Franc","FX","Suisse / US",.891,.12,7.2,"Neutre","Refuge + SNB",{usd:.64,rates:.35,growth:.02,risk:.48},4),
+            asset("NZDUSD","NZD/USD","Dollar néo-zélandais","FX","Nouvelle-Zélande / US",.574,.67,11.1,"Haussier","Carry + Chine",{usd:-.7,rates:-.12,growth:.45,risk:.68,china:.62},4),
+            asset("EURGBP","EUR/GBP","Euro / Livre","FX","Europe / UK",.853,-.08,5.1,"Neutre","BCE vs BoE",{usd:-.05,rates:-.12,growth:-.16,inflation:.04,risk:-.02},4),
+            asset("EURJPY","EUR/JPY","Euro / Yen","FX","Europe / Japon",161.28,.21,10.2,"Constructif","Carry européen",{usd:-.18,rates:.55,growth:.25,risk:.58},2),
+            asset("USDMXN","USD/MXN","Dollar / Peso mexicain","FX","Mexique / US",18.34,-.74,14.7,"Baissier","Carry + risque",{usd:.6,rates:.3,growth:-.25,inflation:.1,risk:-.82},2),
+            asset("USDZAR","USD/ZAR","Dollar / Rand","FX","Afrique du Sud / US",18.08,-.46,16.8,"Baissier","Métaux + risque",{usd:.62,rates:.25,growth:-.18,inflation:.1,risk:-.78,china:-.28},2),
+            asset("USDCNH","USD/CNH","Dollar / Yuan offshore","FX","Chine / US",7.263,.15,5.8,"Neutre","PBoC + commerce",{usd:.52,rates:.15,growth:-.22,risk:-.2,china:-.92},3),
+
+            asset("SPX","SPX","S&P 500","Indices","États-Unis",5980,.65,15.2,"Haussier","Croissance US",{usd:-.22,rates:-.52,growth:.9,inflation:-.16,risk:.92,china:.08,oil:-.1},0),
+            asset("NDX","NDX","Nasdaq 100","Indices","États-Unis",19450,.91,19.5,"Haussier","Taux longs + IA",{usd:-.28,rates:-.82,growth:.9,inflation:-.28,risk:.94,crypto:.15},0),
+            asset("DJI","DJI","Dow Jones","Indices","États-Unis",42580,.32,13.1,"Constructif","Cycle industriel",{usd:-.16,rates:-.25,growth:.82,inflation:.06,risk:.72,oil:.08},0),
+            asset("RUT","RUT","Russell 2000","Indices","États-Unis",2184,.84,24.8,"Haussier","Crédit + taux",{usd:-.08,rates:-.72,growth:.92,inflation:-.2,risk:1},0),
+            asset("SX5E","SX5E","Euro Stoxx 50","Indices","Zone euro",5290,.47,17.6,"Constructif","Cycle européen",{usd:-.36,rates:-.3,growth:.82,inflation:-.05,risk:.82,china:.2},0),
+            asset("DAX","DAX","DAX 40","Indices","Allemagne",20340,.53,18.2,"Haussier","Export + Chine",{usd:-.33,rates:-.28,growth:.84,risk:.8,china:.46},0),
+            asset("CAC","CAC","CAC 40","Indices","France",7895,.26,17.1,"Neutre","Luxe + Chine",{usd:-.28,rates:-.22,growth:.65,risk:.72,china:.55},0),
+            asset("FTSE","FTSE","FTSE 100","Indices","Royaume-Uni",8480,.14,14.3,"Neutre","Énergie + GBP",{usd:-.05,rates:-.12,growth:.5,inflation:.22,risk:.55,oil:.42},0),
+            asset("NKY","NKY","Nikkei 225","Indices","Japon",39980,.71,21.4,"Haussier","Yen + semi-conducteurs",{usd:.22,rates:.16,growth:.78,risk:.86,china:.18},0),
+            asset("HSI","HSI","Hang Seng","Indices","Hong Kong",18940,1.12,28.6,"Haussier","Stimulus chinois",{usd:-.12,rates:-.18,growth:.72,risk:.82,china:1},0),
+
+            asset("US2Y","US2Y","Treasury US 2 ans","Rates","États-Unis",4.28,-.03,4.9,"Détente","Trajectoire Fed",{usd:.32,rates:1,growth:.3,inflation:.75,risk:-.08},2,"%"),
+            asset("US10Y","US10Y","Treasury US 10 ans","Rates","États-Unis",4.12,.02,6.8,"Neutre","Taux réels + prime",{usd:.28,rates:1,growth:.46,inflation:.82,risk:-.18},2,"%"),
+            asset("US30Y","US30Y","Treasury US 30 ans","Rates","États-Unis",4.36,.03,9.1,"Sous pression","Prime de terme",{usd:.22,rates:.95,growth:.42,inflation:.92,risk:-.28},2,"%"),
+            asset("DE10Y","DE10Y","Bund allemand 10 ans","Rates","Allemagne",2.46,-.01,7.3,"Détente","BCE + inflation",{usd:-.24,rates:.86,growth:.38,inflation:.78,risk:-.22},2,"%"),
+            asset("UK10Y","UK10Y","Gilt britannique 10 ans","Rates","Royaume-Uni",4.18,.01,8.5,"Neutre","BoE + salaires",{usd:-.08,rates:.88,growth:.4,inflation:.84,risk:-.2},2,"%"),
+            asset("JP10Y","JP10Y","JGB Japon 10 ans","Rates","Japon",1.04,.02,6.1,"Haussier","Normalisation BoJ",{usd:-.14,rates:.72,growth:.25,inflation:.63,risk:-.1},2,"%"),
+            asset("TLT","TLT","ETF Treasuries 20+ ans","Rates","États-Unis",91.24,-.38,15.8,"Baissier","Duration US",{usd:-.18,rates:-1,growth:-.25,inflation:-.78,risk:.25},2),
+            asset("MOVE","MOVE","MOVE Index","Volatility","États-Unis",96.4,2.15,34.2,"Tendu","Volatilité taux",{usd:.12,rates:.35,growth:-.22,inflation:.45,risk:-.8},1),
+
+            asset("XAU","XAU/USD","Or spot","Commodities","Global",2685,1.12,16.4,"Haussier","Taux réels + dollar",{usd:-.92,rates:-.78,growth:-.08,inflation:.62,risk:-.28,china:.18},0),
+            asset("XAG","XAG/USD","Argent spot","Commodities","Global",31.45,.87,28.6,"Haussier","Or + industrie",{usd:-.72,rates:-.48,growth:.45,inflation:.58,risk:.08,china:.36},2),
+            asset("WTI","WTI","Pétrole WTI","Commodities","États-Unis",78.65,-.62,31.2,"Baissier","OPEP + demande",{usd:-.32,rates:-.08,growth:.72,inflation:.72,risk:.2,china:.48,oil:1},2),
+            asset("BRENT","BRENT","Pétrole Brent","Commodities","Global",82.14,-.48,29.4,"Baissier","OPEP + géopolitique",{usd:-.3,rates:-.05,growth:.68,inflation:.76,risk:.14,china:.45,oil:1},2),
+            asset("NATGAS","NG","Gaz naturel US","Commodities","États-Unis",2.89,2.34,58.4,"Volatil","Météo + stocks",{usd:-.12,rates:0,growth:.28,inflation:.45,risk:.02,oil:.42},2),
+            asset("COPPER","HG","Cuivre","Commodities","Global",4.52,1.26,25.1,"Haussier","Chine + stocks",{usd:-.42,rates:-.18,growth:.72,inflation:.38,risk:.45,china:1},2),
+            asset("CORN","CORN","Maïs","Commodities","Global",4.36,-.27,24.8,"Neutre","Météo + récoltes",{usd:-.25,rates:0,growth:.12,inflation:.55,risk:.02,china:.22,oil:.12},2),
+            asset("WHEAT","WHEAT","Blé","Commodities","Global",5.72,.44,30.6,"Constructif","Climat + mer Noire",{usd:-.24,rates:0,growth:.08,inflation:.62,risk:-.1,china:.15,oil:.08},2),
+            asset("URANIUM","URA","Uranium ETF","Commodities","Global",29.84,1.54,36.8,"Haussier","Cycle nucléaire",{usd:-.18,rates:-.28,growth:.56,inflation:.28,risk:.62,china:.32,oil:.2},2),
+            asset("BCOM","BCOM","Bloomberg Commodity","Commodities","Global",103.2,.36,14.9,"Constructif","Dollar + demande",{usd:-.58,rates:-.16,growth:.52,inflation:.75,risk:.24,china:.48,oil:.62},1),
+
+            asset("BTC","BTC/USD","Bitcoin","Crypto","Global",98540,2.86,54.2,"Haussier","Liquidité globale",{usd:-.48,rates:-.62,growth:.28,inflation:.12,risk:.9,crypto:1},0),
+            asset("ETH","ETH/USD","Ethereum","Crypto","Global",3840,3.42,66.5,"Haussier","Liquidité + activité",{usd:-.42,rates:-.58,growth:.35,risk:.95,crypto:1},0),
+            asset("SOL","SOL/USD","Solana","Crypto","Global",212.6,5.18,78.4,"Haussier","Beta crypto",{usd:-.35,rates:-.45,growth:.4,risk:1,crypto:1},1),
+            asset("BNB","BNB/USD","BNB","Crypto","Global",682,1.64,58.7,"Constructif","Flux exchange",{usd:-.32,rates:-.42,growth:.35,risk:.86,china:.12,crypto:.9},0),
+            asset("XRP","XRP/USD","XRP","Crypto","Global",1.18,2.23,74.6,"Constructif","Régulation + flux",{usd:-.28,rates:-.35,growth:.22,risk:.82,crypto:.88},3),
+            asset("ADA","ADA/USD","Cardano","Crypto","Global",.72,3.1,81.2,"Spéculatif","Beta altcoins",{usd:-.3,rates:-.38,growth:.32,risk:1,crypto:.95},3),
+            asset("LINK","LINK/USD","Chainlink","Crypto","Global",24.8,4.06,76.8,"Haussier","Infrastructure on-chain",{usd:-.3,rates:-.42,growth:.38,risk:.95,crypto:.98},2),
+            asset("TOTAL3","TOTAL3","Capitalisation altcoins","Crypto","Global",1.08,3.82,69.4,"Haussier","Breadth crypto",{usd:-.38,rates:-.5,growth:.4,risk:1,crypto:1},2," T$"),
+
+            asset("VIX","VIX","VIX Index","Volatility","États-Unis",18.4,-4.2,72.5,"Calme","Stress actions",{usd:.12,rates:.2,growth:-.62,inflation:.25,risk:-1,crypto:-.25},1),
+            asset("HYG","HYG","High Yield ETF","Credit","États-Unis",79.34,.18,8.4,"Constructif","Spreads crédit",{usd:-.08,rates:-.45,growth:.72,inflation:-.08,risk:.88},2),
+            asset("LQD","LQD","Investment Grade ETF","Credit","États-Unis",109.68,-.12,9.6,"Neutre","Duration + spreads",{usd:-.1,rates:-.78,growth:.28,inflation:-.42,risk:.38},2),
+            asset("EMB","EMB","Dette émergente ETF","Credit","Émergents",91.45,.31,11.8,"Constructif","Dollar + spreads",{usd:-.62,rates:-.5,growth:.5,inflation:-.08,risk:.82,china:.32},2),
+            asset("CDXHY","CDX HY","CDX High Yield Spread","Credit","États-Unis",315,-1.8,18.2,"Resserrement","Risque de défaut",{usd:.18,rates:.22,growth:-.82,inflation:.12,risk:-1},0," pb"),
+            asset("IGSPREAD","IG OAS","Spread IG US","Credit","États-Unis",86,-.9,12.4,"Serré","Cycle + liquidité",{usd:.12,rates:.18,growth:-.65,inflation:.08,risk:-.86},0," pb"),
+            asset("HYSPREAD","HY OAS","Spread HY US","Credit","États-Unis",294,-2.4,20.7,"Serré","Défauts + croissance",{usd:.16,rates:.22,growth:-.9,inflation:.12,risk:-1},0," pb")
+        ];
+
+        const macroMetrics = [
+            { label: "Fed Funds", value: "4,25–4,50%", delta: "Biais d'assouplissement", tone: "green", icon: "fa-building-columns" },
+            { label: "Inflation US", value: "2,7%", delta: "Désinflation lente", tone: "amber", icon: "fa-fire" },
+            { label: "DXY", value: "103,85", delta: "-1,8% sur 30 j", tone: "green", icon: "fa-dollar-sign" },
+            { label: "US 10 ans", value: "4,12%", delta: "+2 pb", tone: "red", icon: "fa-chart-line" },
+            { label: "VIX", value: "18,4", delta: "Risque contenu", tone: "green", icon: "fa-wave-square" },
+            { label: "Crédit HY", value: "294 pb", delta: "Spreads serrés", tone: "amber", icon: "fa-layer-group" },
+            { label: "Cuivre / Or", value: "0,00168", delta: "Cycle stable", tone: "cyan", icon: "fa-industry" },
+            { label: "Liquidité", value: "67 / 100", delta: "Constructive", tone: "green", icon: "fa-water" }
+        ];
+
+        const heroSignals = [
+            { label: "Croissance", value: "Expansion lente", tone: "text-emerald-300", icon: "fa-arrow-trend-up" },
+            { label: "Inflation", value: "Décélération", tone: "text-cyan-300", icon: "fa-arrow-down-long" },
+            { label: "Liquidité", value: "Positive", tone: "text-indigo-300", icon: "fa-droplet" }
+        ];
+
+        const factorPulse = [
+            { label: "Croissance", value: 72, color: "#36d399" },
+            { label: "Liquidité", value: 67, color: "#7c6cff" },
+            { label: "Inflation", value: 46, color: "#fbbf24" },
+            { label: "Dollar", value: 38, color: "#24d3ee" },
+            { label: "Stress", value: 31, color: "#fb7185" }
+        ];
+
+        const scenarios = [
+            {
+                id: "fed-cuts", title: "Détente monétaire", subtitle: "La Fed baisse plus vite que prévu",
+                icon: "fa-dove", color: "#7c6cff",
+                explanation: "Une détente plus rapide comprime les taux réels, affaiblit le dollar et élargit la demande de duration et d'actifs risqués.",
+                shocks: { usd:-.8, rates:-1, growth:.2, inflation:.1, risk:.75, crypto:.45 },
+                transmission: ["Taux courts ↓", "Dollar ↓", "Conditions financières ↑", "Duration et risque ↑"]
+            },
+            {
+                id: "hot-cpi", title: "Inflation surprise", subtitle: "Le CPI repart nettement au-dessus du consensus",
+                icon: "fa-temperature-high", color: "#fb7185",
+                explanation: "Le marché repousse les baisses de taux. Les rendements et le dollar remontent pendant que les multiples de valorisation se contractent.",
+                shocks: { usd:.65, rates:.95, growth:-.2, inflation:1, risk:-.65, crypto:-.2 },
+                transmission: ["Inflation anticipée ↑", "Taux réels ↑", "Dollar ↑", "Duration et crédit ↓"]
+            },
+            {
+                id: "recession", title: "Récession US", subtitle: "L'emploi et les enquêtes décrochent ensemble",
+                icon: "fa-chart-line-down", color: "#60a5fa",
+                explanation: "La demande de sécurité domine. La courbe anticipe des baisses de taux, le crédit s'écarte et les actifs cycliques corrigent.",
+                shocks: { usd:.35, rates:-.85, growth:-1, inflation:-.55, risk:-1, china:-.25, oil:-.55, crypto:-.45 },
+                transmission: ["Croissance ↓", "Spreads ↑", "Taux longs ↓", "Cycliques et matières ↓"]
+            },
+            {
+                id: "geopolitical", title: "Choc géopolitique", subtitle: "Rupture d'offre et recherche de refuges",
+                icon: "fa-shield-halved", color: "#f59e0b",
+                explanation: "La prime de risque et l'énergie montent simultanément. L'or et le dollar captent les flux défensifs, les actifs risqués reculent.",
+                shocks: { usd:.5, rates:-.15, growth:-.5, inflation:.58, risk:-1, oil:.9, crypto:-.35 },
+                transmission: ["Prime géopolitique ↑", "Énergie ↑", "Inflation ↑", "Refuges ↑ / risque ↓"]
+            },
+            {
+                id: "china", title: "Relance chinoise", subtitle: "Stimulus fiscal et crédit plus puissant",
+                icon: "fa-city", color: "#36d399",
+                explanation: "Une impulsion chinoise soutient les métaux, les devises matières premières et les indices exposés au commerce asiatique.",
+                shocks: { usd:-.15, rates:.1, growth:.65, inflation:.28, risk:.7, china:1, oil:.38 },
+                transmission: ["Crédit chinois ↑", "Demande cyclique ↑", "Métaux ↑", "AUD et Asie ↑"]
+            },
+            {
+                id: "oil-shock", title: "Pétrole à 120 $", subtitle: "Restriction d'offre énergétique brutale",
+                icon: "fa-oil-well", color: "#fbbf24",
+                explanation: "Le choc d'offre renforce l'inflation mais pèse sur la consommation. Les producteurs gagnent, la duration et les importateurs souffrent.",
+                shocks: { usd:.18, rates:.45, growth:-.42, inflation:.95, risk:-.48, china:-.18, oil:1 },
+                transmission: ["Offre pétrole ↓", "Énergie ↑", "Inflation ↑", "Marges hors énergie ↓"]
+            },
+            {
+                id: "liquidity", title: "Vague de liquidité", subtitle: "Dollar faible et bilan global en expansion",
+                icon: "fa-water", color: "#24d3ee",
+                explanation: "La liquidité marginale se dirige vers les actifs à forte duration et fort bêta, avec une amplification particulière dans la crypto.",
+                shocks: { usd:-.75, rates:-.55, growth:.32, inflation:.16, risk:1, china:.2, oil:.18, crypto:1 },
+                transmission: ["Dollar ↓", "Liquidité globale ↑", "Volatilité ↓", "Beta et crypto ↑"]
+            },
+            {
+                id: "crypto-stress", title: "Stress crypto", subtitle: "Déleveraging et rupture de confiance",
+                icon: "fa-bolt", color: "#f97316",
+                explanation: "Une liquidation forcée frappe d'abord les altcoins puis contamine les actifs liquides via la réduction du levier et du risque.",
+                shocks: { usd:.2, rates:-.08, growth:-.12, inflation:0, risk:-.52, crypto:-1 },
+                transmission: ["Levier crypto ↓", "Volatilité ↑", "Altcoins ↓↓", "Contagion risque limitée"]
+            }
+        ];
+
+        const insights = [
+            {
+                id: "duration", tab: "Duration", kicker: "Thèse tactique · 1–3 mois", title: "La duration redevient convexe si l'emploi ralentit",
+                confidence: 74,
+                summary: "Le couple croissance plus lente / inflation en reflux crée une asymétrie favorable aux obligations longues. Le risque principal reste une remontée de la prime de terme indépendante de la Fed.",
+                catalyst: "Deux publications emploi sous le consensus et poursuite de la désinflation cœur.",
+                expression: "TLT long, Nasdaq sélectif, couverture via une petite position dollar.",
+                invalidation: "US 10 ans au-dessus de 4,55% avec anticipations d'inflation en hausse."
+            },
+            {
+                id: "china-metals", tab: "Chine & métaux", kicker: "Thèse cyclique · 3–6 mois", title: "Le cuivre attend une confirmation du crédit chinois",
+                confidence: 62,
+                summary: "Les métaux ont intégré une partie de la reprise, mais la demande physique reste le test décisif. Le ratio cuivre/or doit s'améliorer pour confirmer un vrai basculement cyclique.",
+                catalyst: "Accélération du crédit, baisse des stocks visibles et reprise immobilière marginale.",
+                expression: "Cuivre contre or, AUD/USD et DAX comme expressions graduelles.",
+                invalidation: "Nouveau recul des importations et cassure des métaux sous leur moyenne longue."
+            },
+            {
+                id: "usd", tab: "Dollar", kicker: "Thèse relative · 1–3 mois", title: "Le dollar perd son monopole de croissance",
+                confidence: 68,
+                summary: "L'écart de surprise économique se resserre entre les États-Unis et le reste du monde. Sans nouveau choc d'aversion au risque, le portage du dollar devient moins dominant.",
+                catalyst: "Convergence des PMI et communication plus patiente de la Fed.",
+                expression: "EUR/USD, or et dette émergente en panier diversifié.",
+                invalidation: "Rebond net de l'exceptionnalisme US ou stress géopolitique global."
+            },
+            {
+                id: "credit", tab: "Crédit", kicker: "Signal de risque · continu", title: "Les spreads sont calmes, peut-être trop calmes",
+                confidence: 79,
+                summary: "Le crédit ne signale pas encore de rupture, mais la compression limite le coussin de sécurité. Le rapport rendement/risque devient vulnérable à une surprise de croissance.",
+                catalyst: "Révisions de bénéfices, défauts et standards bancaires de crédit.",
+                expression: "Réduire le bêta HY, préférer la qualité et conserver une convexité VIX.",
+                invalidation: "Réaccélération des bénéfices et nouvelle détente durable des conditions financières."
+            },
+            {
+                id: "crypto", tab: "Crypto", kicker: "Régime de liquidité · 1–2 mois", title: "La breadth compte davantage que le seul Bitcoin",
+                confidence: 66,
+                summary: "Un marché crypto durable exige que la participation s'élargisse sans explosion du levier. Le signal clé vient du couple TOTAL3 / volatilité, pas uniquement du prix du Bitcoin.",
+                catalyst: "Flux nets, activité on-chain et détente du dollar.",
+                expression: "BTC cœur, ETH et infrastructure en satellites, taille contrôlée.",
+                invalidation: "Hausse du financement perpétuel sans amélioration de la participation."
+            }
+        ];
+
+        const watchSignals = [
+            { title: "US 10 ans ↔ Nasdaq", text: "La sensibilité de la tech aux taux réels remonte.", priority: "ÉLEVÉE", color: "#fb7185" },
+            { title: "Cuivre ↔ Or", text: "Ratio charnière pour valider le scénario de croissance.", priority: "MOYENNE", color: "#fbbf24" },
+            { title: "HYG ↔ VIX", text: "Le crédit ne confirme pas encore le stress actions.", priority: "ÉLEVÉE", color: "#fb7185" },
+            { title: "DXY ↔ BTC", text: "La liquidité reste le principal canal commun.", priority: "MOYENNE", color: "#7c6cff" }
+        ];
+
+        const state = {
+            category: "Tous",
+            search: "",
+            sort: "name",
+            starred: new Set(["EURUSD","XAU","SPX","NDX","BTC","US10Y"]),
+            matrixPreset: "core",
+            scenarioId: "fed-cuts",
+            severity: 100,
+            insightId: "duration",
+            portfolio: {
+                EURUSD: { allocation: 15, direction: 1 },
+                XAU: { allocation: 20, direction: 1 },
+                SPX: { allocation: 20, direction: 1 },
+                NDX: { allocation: 15, direction: 1 },
+                BTC: { allocation: 10, direction: 1 },
+                US10Y: { allocation: 20, direction: -1 }
+            }
+        };
+
+        const matrixPresets = {
+            core: { label: "Core macro", ids: ["DXY","EURUSD","US10Y","XAU","WTI","SPX","NDX","VIX","BTC","HYG"] },
+            inflation: { label: "Inflation", ids: ["DXY","US2Y","US10Y","TLT","XAU","XAG","WTI","COPPER","BCOM","SPX"] },
+            risk: { label: "Risk pulse", ids: ["VIX","MOVE","HYG","CDXHY","SPX","RUT","NKY","AUDUSD","XAU","DXY"] },
+            crypto: { label: "Crypto", ids: ["BTC","ETH","SOL","BNB","XRP","LINK","TOTAL3","NDX","DXY","VIX"] },
+            china: { label: "Chine", ids: ["USDCNH","AUDUSD","HSI","DAX","CAC","COPPER","XAG","WTI","BCOM","XAU"] }
+        };
+
+        function byId(id) { return assets.find(function(item) { return item.id === id; }); }
+        function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+        function factorValue(item, key) { return item.factors[key] || 0; }
+        function signed(value, digits) { return (value >= 0 ? "+" : "") + value.toFixed(digits == null ? 2 : digits) + "%"; }
+        function formatPrice(item) {
+            return item.price.toLocaleString("fr-FR", { minimumFractionDigits: item.decimals, maximumFractionDigits: item.decimals }) + item.suffix;
+        }
+        function toneClass(value) { return value >= 0 ? "text-emerald-300" : "text-rose-300"; }
+        function signalTone(signal) {
+            if (/Haussier|Constructif|Détente|Serré|Resserrement/.test(signal)) return "text-emerald-300 bg-emerald-400/10 border-emerald-400/20";
+            if (/Baissier|pression|Tendu/.test(signal)) return "text-rose-300 bg-rose-400/10 border-rose-400/20";
+            if (/Volatil|Spéculatif/.test(signal)) return "text-amber-300 bg-amber-400/10 border-amber-400/20";
+            return "text-zinc-300 bg-white/[.04] border-white/[.08]";
+        }
+
+        function correlation(a, b) {
+            if (a.id === b.id) return 1;
+            let dot = 0, normA = 0, normB = 0;
+            factorKeys.forEach(function(key) {
+                const av = factorValue(a, key);
+                const bv = factorValue(b, key);
+                dot += av * bv;
+                normA += av * av;
+                normB += bv * bv;
+            });
+            if (!normA || !normB) return 0;
+            let result = dot / Math.sqrt(normA * normB);
+            if (a.category === b.category) result = result * .88 + .08;
+            return clamp(result * .94, -.95, .95);
+        }
+
+        function currentScenario() { return scenarios.find(function(item) { return item.id === state.scenarioId; }); }
+        function scenarioImpact(item) {
+            const scenario = currentScenario();
+            let raw = 0;
+            factorKeys.forEach(function(key) { raw += factorValue(item, key) * (scenario.shocks[key] || 0); });
+            const volScale = .55 + Math.min(item.vol, 65) / 22;
+            return clamp(raw * volScale * 1.35 * state.severity / 100, -15, 15);
+        }
+
+        function renderHero() {
+            document.getElementById("hero-signals").innerHTML = heroSignals.map(function(item) {
+                return "<div class='soft-panel rounded-2xl px-4 py-3 flex items-center justify-between'>" +
+                    "<div class='flex items-center gap-3'><i class='fa-solid " + item.icon + " text-zinc-500 text-xs'></i><span class='text-xs text-zinc-400'>" + item.label + "</span></div>" +
+                    "<span class='text-xs font-semibold " + item.tone + "'>" + item.value + "</span></div>";
+            }).join("");
+        }
+
+        function renderMacroMetrics() {
+            const toneColors = { green: "text-emerald-300", amber: "text-amber-300", red: "text-rose-300", cyan: "text-cyan-300" };
+            document.getElementById("macro-metrics").innerHTML = macroMetrics.map(function(item) {
+                return "<div class='panel lift rounded-2xl p-4 min-h-[132px] flex flex-col justify-between'>" +
+                    "<div class='flex items-start justify-between gap-2'><span class='text-[10px] text-zinc-500'>" + item.label + "</span><i class='fa-solid " + item.icon + " text-zinc-600 text-xs'></i></div>" +
+                    "<div><div class='metric-value'>" + item.value + "</div><div class='text-[9px] mt-2 " + toneColors[item.tone] + "'>" + item.delta + "</div></div></div>";
+            }).join("");
+        }
+
+        function renderFactorPulse() {
+            document.getElementById("factor-pulse").innerHTML = factorPulse.map(function(item) {
+                return "<div><div class='flex justify-between text-xs mb-2'><span class='text-zinc-300'>" + item.label + "</span><span class='font-mono text-zinc-500'>" + item.value + "</span></div>" +
+                    "<div class='h-1.5 bg-white/[.05] rounded-full overflow-hidden'><div class='h-full rounded-full' style='width:" + item.value + "%;background:" + item.color + "'></div></div></div>";
+            }).join("");
+
+            const chain = [
+                { icon: "fa-building-columns", title: "Fed plus patiente", text: "La prime de taux se stabilise", color: "text-indigo-300" },
+                { icon: "fa-arrow-down", title: "Dollar moins dominant", text: "Les conditions globales respirent", color: "text-cyan-300" },
+                { icon: "fa-arrow-trend-up", title: "Breadth plus large", text: "Le risque s'étend hors mega caps", color: "text-emerald-300" }
+            ];
+            document.getElementById("causal-chain").innerHTML = chain.map(function(item) {
+                return "<div class='signal-line relative flex gap-3'><div class='w-9 h-9 shrink-0 rounded-xl bg-white/[.04] border border-white/[.07] flex items-center justify-center " + item.color + "'><i class='fa-solid " + item.icon + " text-xs'></i></div>" +
+                    "<div><div class='text-xs font-semibold'>" + item.title + "</div><div class='text-[10px] text-zinc-500 mt-1 leading-relaxed'>" + item.text + "</div></div></div>";
+            }).join("");
+        }
+
+        let regimeChart;
+        function initRegimeChart() {
+            if (typeof Chart === "undefined") return;
+            const canvas = document.getElementById("regime-chart");
+            regimeChart = new Chart(canvas, {
+                type: "radar",
+                data: {
+                    labels: ["Croissance","Inflation","Liquidité","Risque","Dollar","Crédit"],
+                    datasets: [
+                        { label: "Actuel", data: [68,44,72,64,38,76], borderColor: "#7c6cff", backgroundColor: "rgba(124,108,255,.18)", pointBackgroundColor: "#a99eff", borderWidth: 2 },
+                        { label: "Mois précédent", data: [61,52,59,57,49,71], borderColor: "rgba(85,223,244,.45)", backgroundColor: "rgba(85,223,244,.025)", pointRadius: 0, borderDash: [4,4], borderWidth: 1.5 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: "#8c95a8", boxWidth: 10, boxHeight: 10, usePointStyle: true, font: { size: 10 } } } },
+                    scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 20 }, grid: { color: "rgba(255,255,255,.07)" }, angleLines: { color: "rgba(255,255,255,.07)" }, pointLabels: { color: "#9ca4b6", font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function categories() {
+            return ["Tous"].concat(Object.keys(categoryMeta));
+        }
+
+        function renderCategoryFilters() {
+            document.getElementById("category-filters").innerHTML = categories().map(function(category) {
+                const active = state.category === category ? " active" : "";
+                const label = category === "Tous" ? "Tous" : categoryMeta[category].label;
+                return "<button class='chip" + active + " whitespace-nowrap rounded-xl px-3 py-2.5 text-xs' data-category='" + category + "' type='button'>" + label + "</button>";
+            }).join("");
+        }
+
+        function filteredAssets() {
+            let result = assets.filter(function(item) {
+                const categoryMatch = state.category === "Tous" || item.category === state.category;
+                const q = state.search.toLowerCase().trim();
+                const searchMatch = !q || (item.ticker + " " + item.name + " " + item.region + " " + item.driver).toLowerCase().includes(q);
+                return categoryMatch && searchMatch;
+            });
+            result.sort(function(a, b) {
+                if (state.sort === "change-desc") return b.change - a.change;
+                if (state.sort === "change-asc") return a.change - b.change;
+                if (state.sort === "vol-desc") return b.vol - a.vol;
+                return a.name.localeCompare(b.name, "fr");
+            });
+            return result;
+        }
+
+        function renderAssets() {
+            renderCategoryFilters();
+            const list = filteredAssets();
+            document.getElementById("asset-result-count").textContent = list.length;
+            document.getElementById("selected-count").textContent = state.starred.size;
+            document.getElementById("asset-empty").classList.toggle("hidden", list.length !== 0);
+            document.getElementById("asset-table").innerHTML = list.map(function(item) {
+                const meta = categoryMeta[item.category];
+                const starred = state.starred.has(item.id);
+                return "<tr class='asset-row border-b border-white/[.055]' data-asset-row='" + item.id + "'>" +
+                    "<td class='pl-5 py-3.5'><button class='star-btn w-8 h-8 rounded-xl hover:bg-white/[.06] text-zinc-700 " + (starred ? "starred" : "") + "' data-id='" + item.id + "' type='button' aria-label='Épingler'><i class='fa-" + (starred ? "solid" : "regular") + " fa-star'></i></button></td>" +
+                    "<td class='px-3 py-3.5'><div class='flex items-center gap-3'><div class='w-9 h-9 rounded-xl flex items-center justify-center text-xs' style='background:" + meta.color + "18;color:" + meta.color + "'><i class='fa-solid " + meta.icon + "'></i></div><div><div class='font-mono text-xs font-medium text-white'>" + item.ticker + "</div><div class='text-[10px] text-zinc-500 mt-0.5'>" + item.name + " · " + item.region + "</div></div></div></td>" +
+                    "<td class='px-3'><span class='inline-flex items-center gap-2 text-[10px] text-zinc-400'><span class='category-dot' style='background:" + meta.color + "'></span>" + meta.label + "</span></td>" +
+                    "<td class='px-3 text-right font-mono text-xs'>" + formatPrice(item) + "</td>" +
+                    "<td class='px-3 text-right font-mono text-xs " + toneClass(item.change) + "'>" + signed(item.change, 2) + "</td>" +
+                    "<td class='px-3 text-right font-mono text-[10px] text-zinc-400'>" + item.vol.toFixed(1) + "%</td>" +
+                    "<td class='px-3'><span class='inline-flex border rounded-lg px-2 py-1 text-[9px] " + signalTone(item.signal) + "'>" + item.signal + "</span></td>" +
+                    "<td class='px-3 text-[10px] text-zinc-400'>" + item.driver + "</td>" +
+                    "<td class='pr-5 text-right'><button class='asset-detail-btn w-8 h-8 rounded-xl hover:bg-white/[.06] text-zinc-500' data-id='" + item.id + "' type='button'><i class='fa-solid fa-arrow-up-right-from-square text-[10px]'></i></button></td></tr>";
+            }).join("");
+            renderPortfolioAddOptions();
+        }
+
+        function toggleStar(id) {
+            if (state.starred.has(id)) {
+                state.starred.delete(id);
+                delete state.portfolio[id];
+            } else {
+                state.starred.add(id);
+                if (!state.portfolio[id]) state.portfolio[id] = { allocation: 10, direction: 1 };
+            }
+            renderAssets();
+            renderPortfolio();
+        }
+
+        function assetDominantFactors(item) {
+            return factorKeys.map(function(key) { return { key: key, value: factorValue(item, key) }; })
+                .sort(function(a,b) { return Math.abs(b.value) - Math.abs(a.value); }).slice(0,3);
+        }
+
+        function showAssetDetail(id) {
+            const item = byId(id);
+            const meta = categoryMeta[item.category];
+            const dominant = assetDominantFactors(item);
+            const peers = assets.filter(function(peer) { return peer.id !== id; }).map(function(peer) {
+                return { peer: peer, value: correlation(item, peer) };
+            }).sort(function(a,b) { return Math.abs(b.value) - Math.abs(a.value); }).slice(0,4);
+            const factorHtml = dominant.map(function(entry) {
+                const positive = entry.value >= 0;
+                return "<div class='soft-panel rounded-2xl p-3'><div class='text-[9px] text-zinc-500 uppercase tracking-widest'>" + factorLabels[entry.key] + "</div><div class='font-mono mt-2 " + (positive ? "text-emerald-300" : "text-rose-300") + "'>" + (positive ? "+" : "") + entry.value.toFixed(2) + "</div></div>";
+            }).join("");
+            const peerHtml = peers.map(function(entry) {
+                return "<div class='flex items-center justify-between py-2 border-b border-white/[.06]'><div><span class='font-mono text-xs'>" + entry.peer.ticker + "</span><span class='text-[10px] text-zinc-600 ml-2'>" + entry.peer.name + "</span></div><span class='font-mono text-xs " + toneClass(entry.value) + "'>" + entry.value.toFixed(2) + "</span></div>";
+            }).join("");
+            showModal(
+                "<div class='flex items-start justify-between gap-5'><div class='flex items-center gap-4'><div class='w-14 h-14 rounded-2xl flex items-center justify-center text-xl' style='background:" + meta.color + "18;color:" + meta.color + "'><i class='fa-solid " + meta.icon + "'></i></div><div><div class='eyebrow'>" + meta.label + " · " + item.region + "</div><h3 class='font-display text-2xl mt-1'>" + item.name + "</h3><div class='font-mono text-xs text-zinc-500 mt-1'>" + item.ticker + "</div></div></div><button class='modal-close text-zinc-500 hover:text-white text-2xl' type='button'>&times;</button></div>" +
+                "<div class='grid grid-cols-3 gap-3 mt-7'><div class='soft-panel rounded-2xl p-4'><div class='text-[9px] text-zinc-500 uppercase tracking-widest'>Dernier</div><div class='font-display text-xl mt-2'>" + formatPrice(item) + "</div></div><div class='soft-panel rounded-2xl p-4'><div class='text-[9px] text-zinc-500 uppercase tracking-widest'>Variation</div><div class='font-display text-xl mt-2 " + toneClass(item.change) + "'>" + signed(item.change,2) + "</div></div><div class='soft-panel rounded-2xl p-4'><div class='text-[9px] text-zinc-500 uppercase tracking-widest'>Vol. 30 j</div><div class='font-display text-xl mt-2'>" + item.vol.toFixed(1) + "%</div></div></div>" +
+                "<div class='mt-7'><div class='eyebrow mb-3'>Sensibilités dominantes</div><div class='grid grid-cols-3 gap-3'>" + factorHtml + "</div></div>" +
+                "<div class='mt-7'><div class='eyebrow mb-2'>Relations les plus fortes</div>" + peerHtml + "</div>" +
+                "<div class='soft-panel rounded-2xl p-4 mt-6 text-xs text-zinc-400'><span class='text-white font-semibold'>Driver principal :</span> " + item.driver + ".</div>"
+            );
+        }
+
+        function heatStyle(value) {
+            const alpha = .05 + Math.abs(value) * .28;
+            if (value >= 0) return "background:rgba(54,211,153," + alpha.toFixed(2) + ");color:#a7f3d0";
+            return "background:rgba(251,113,133," + alpha.toFixed(2) + ");color:#fecdd3";
+        }
+
+        function renderMatrixPresets() {
+            document.getElementById("matrix-presets").innerHTML = Object.keys(matrixPresets).map(function(key) {
+                return "<button class='chip rounded-xl px-3 py-2 text-[10px] whitespace-nowrap " + (state.matrixPreset === key ? "active" : "") + "' data-preset='" + key + "' type='button'>" + matrixPresets[key].label + "</button>";
+            }).join("");
+        }
+
+        function renderCorrelationMatrix() {
+            renderMatrixPresets();
+            const list = matrixPresets[state.matrixPreset].ids.map(byId);
+            let html = "<thead><tr><th class='sticky left-0 top-0 z-20 bg-[#0d1018] text-left p-2 min-w-[98px] text-zinc-600'>ACTIF</th>";
+            list.forEach(function(item) {
+                html += "<th class='sticky top-0 z-10 bg-[#0d1018] p-2 font-mono text-[9px] text-zinc-500'>" + item.ticker + "</th>";
+            });
+            html += "</tr></thead><tbody>";
+            list.forEach(function(row) {
+                html += "<tr><th class='sticky left-0 z-10 bg-[#0d1018] text-left p-2 font-mono text-[9px] text-zinc-400'>" + row.ticker + "</th>";
+                list.forEach(function(col) {
+                    const value = correlation(row,col);
+                    html += "<td class='heat-cell text-center p-2.5 font-mono text-[10px] rounded-md border border-black/10' style='" + heatStyle(value) + "' data-corr-a='" + row.id + "' data-corr-b='" + col.id + "'>" + value.toFixed(2) + "</td>";
+                });
+                html += "</tr>";
+            });
+            html += "</tbody>";
+            document.getElementById("correlation-matrix").innerHTML = html;
+        }
+
+        function correlationInterpretation(value) {
+            const strength = Math.abs(value) > .75 ? "très forte" : Math.abs(value) > .5 ? "marquée" : Math.abs(value) > .25 ? "modérée" : "faible";
+            const direction = value >= 0 ? "positive" : "négative";
+            return "Relation " + strength + " et " + direction;
+        }
+
+        function sharedDrivers(a,b) {
+            const drivers = factorKeys.map(function(key) {
+                return { key: key, score: factorValue(a,key) * factorValue(b,key), strength: Math.abs(factorValue(a,key)) + Math.abs(factorValue(b,key)) };
+            }).sort(function(x,y) { return Math.abs(y.score) - Math.abs(x.score); }).slice(0,2);
+            return drivers.map(function(item) { return factorLabels[item.key]; }).join(" et ");
+        }
+
+        function showCorrelationDetail(aId,bId) {
+            const a = byId(aId), b = byId(bId), value = correlation(a,b);
+            showModal(
+                "<div class='flex justify-between gap-4'><div><div class='eyebrow'>Relation factorielle</div><h3 class='font-display text-2xl mt-2'>" + a.name + " <span class='text-zinc-600'>×</span> " + b.name + "</h3></div><button class='modal-close text-2xl text-zinc-500' type='button'>&times;</button></div>" +
+                "<div class='font-display text-7xl tracking-tighter mt-7 " + toneClass(value) + "'>" + value.toFixed(2) + "</div>" +
+                "<div class='text-sm text-white mt-2'>" + correlationInterpretation(value) + "</div>" +
+                "<p class='text-sm text-zinc-400 leading-relaxed mt-5'>Les principaux canaux communs sont <span class='text-white'>" + sharedDrivers(a,b) + "</span>. Cette estimation vient des expositions factorielles du prototype et non de rendements historiques réels.</p>" +
+                "<div class='soft-panel rounded-2xl p-4 mt-5 text-xs text-zinc-500'>Une corrélation décrit une relation, pas une causalité stable. Elle peut changer brutalement avec le régime de marché.</div>"
+            );
+        }
+
+        function populatePairSelectors() {
+            const options = assets.map(function(item) { return "<option value='" + item.id + "'>" + item.ticker + " · " + item.name + "</option>"; }).join("");
+            document.getElementById("pair-a").innerHTML = options;
+            document.getElementById("pair-b").innerHTML = options;
+            document.getElementById("pair-a").value = "DXY";
+            document.getElementById("pair-b").value = "XAU";
+        }
+
+        let pairChart;
+        function seededSeries(aId,bId,base) {
+            let seed = 0;
+            (aId + bId).split("").forEach(function(char) { seed = (seed * 31 + char.charCodeAt(0)) % 997; });
+            const labels = ["Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc","Jan","Fév","Mar","Avr","Mai","Juin","Juil"];
+            const values = labels.map(function(_,index) {
+                const wave = Math.sin((index + seed % 7) * .72) * .09 + Math.cos((index + seed % 5) * .31) * .04;
+                return clamp(base + wave, -1, 1);
+            });
+            return { labels: labels, values: values };
+        }
+
+        function updatePairLab() {
+            const a = byId(document.getElementById("pair-a").value);
+            const b = byId(document.getElementById("pair-b").value);
+            const value = correlation(a,b);
+            const valueEl = document.getElementById("pair-correlation");
+            valueEl.textContent = value.toFixed(2);
+            valueEl.className = "font-display text-5xl tracking-tighter mt-1 " + toneClass(value);
+            document.getElementById("pair-label").innerHTML = a.ticker + "<br>" + b.ticker;
+            document.getElementById("pair-drivers").innerHTML = "<span class='text-white font-semibold'>" + correlationInterpretation(value) + ".</span> Canaux dominants : " + sharedDrivers(a,b) + ".";
+            if (typeof Chart === "undefined") return;
+            const series = seededSeries(a.id,b.id,value);
+            if (pairChart) pairChart.destroy();
+            pairChart = new Chart(document.getElementById("pair-chart"), {
+                type: "line",
+                data: { labels: series.labels, datasets: [{ data: series.values, borderColor: value >= 0 ? "#36d399" : "#fb7185", backgroundColor: value >= 0 ? "rgba(54,211,153,.08)" : "rgba(251,113,133,.08)", fill: true, tension: .38, pointRadius: 0, borderWidth: 2 }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return " Corr. " + context.parsed.y.toFixed(2); } } } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: "#60697b", maxTicksLimit: 6, font: { size: 9 } } },
+                        y: { min: -1, max: 1, grid: { color: "rgba(255,255,255,.055)" }, ticks: { color: "#60697b", stepSize: .5, font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+
+        function renderScenarioCards() {
+            document.getElementById("scenario-grid").innerHTML = scenarios.map(function(item) {
+                const active = state.scenarioId === item.id ? " active" : "";
+                return "<button class='scenario-card panel lift rounded-2xl p-5 text-left" + active + "' data-scenario='" + item.id + "' type='button'>" +
+                    "<div class='flex items-start justify-between gap-3'><div class='w-10 h-10 rounded-xl flex items-center justify-center' style='background:" + item.color + "18;color:" + item.color + "'><i class='fa-solid " + item.icon + "'></i></div><i class='fa-solid fa-arrow-right text-[10px] text-zinc-700 mt-2'></i></div>" +
+                    "<div class='font-semibold mt-5'>" + item.title + "</div><div class='text-[10px] text-zinc-500 mt-1.5'>" + item.subtitle + "</div></button>";
+            }).join("");
+        }
+
+        function renderScenario() {
+            renderScenarioCards();
+            const scenario = currentScenario();
+            document.getElementById("severity-label").textContent = state.severity + "%";
+            document.getElementById("scenario-title").textContent = scenario.title;
+            document.getElementById("scenario-subtitle").textContent = scenario.subtitle;
+            document.getElementById("scenario-explanation").textContent = scenario.explanation;
+            document.getElementById("scenario-icon").innerHTML = "<i class='fa-solid " + scenario.icon + "'></i>";
+            document.getElementById("scenario-icon").style.color = scenario.color;
+            document.getElementById("scenario-icon").style.background = scenario.color + "18";
+            document.getElementById("scenario-transmission").innerHTML = scenario.transmission.map(function(step,index) {
+                return "<div class='flex items-center gap-3'><span class='w-6 h-6 rounded-lg bg-white/[.05] border border-white/[.07] flex items-center justify-center font-mono text-[9px] text-zinc-500'>" + (index + 1) + "</span><span class='text-xs text-zinc-300'>" + step + "</span></div>";
+            }).join("");
+
+            const impactList = assets.map(function(item) { return { item: item, impact: scenarioImpact(item) }; })
+                .sort(function(a,b) { return Math.abs(b.impact) - Math.abs(a.impact); }).slice(0,12);
+            document.getElementById("scenario-impact-list").innerHTML = impactList.map(function(entry) {
+                const width = Math.max(3, Math.abs(entry.impact) / 15 * 100);
+                const color = entry.impact >= 0 ? "#36d399" : "#fb7185";
+                return "<div class='grid grid-cols-[84px_1fr_58px] sm:grid-cols-[130px_1fr_70px] gap-3 items-center'>" +
+                    "<div><div class='font-mono text-[10px] text-white'>" + entry.item.ticker + "</div><div class='text-[9px] text-zinc-600 truncate'>" + entry.item.name + "</div></div>" +
+                    "<div class='h-2 bg-white/[.04] rounded-full overflow-hidden'><div class='h-full rounded-full' style='width:" + width.toFixed(1) + "%;background:" + color + "'></div></div>" +
+                    "<div class='font-mono text-xs text-right " + toneClass(entry.impact) + "'>" + signed(entry.impact,1) + "</div></div>";
+            }).join("");
+            renderPortfolio();
+        }
+
+        function renderPortfolioAddOptions() {
+            const select = document.getElementById("portfolio-add-select");
+            if (!select) return;
+            const available = assets.filter(function(item) { return !state.portfolio[item.id]; });
+            select.innerHTML = available.map(function(item) { return "<option value='" + item.id + "'>" + item.ticker + " · " + item.name + "</option>"; }).join("");
+            document.getElementById("portfolio-add-btn").disabled = available.length === 0;
+        }
+
+        function renderPortfolio() {
+            const ids = Object.keys(state.portfolio);
+            const body = document.getElementById("portfolio-rows");
+            if (!ids.length) {
+                body.innerHTML = "<tr><td colspan='5' class='text-center py-12 text-zinc-500'>Épinglez des actifs ou ajoutez une position.</td></tr>";
+            } else {
+                body.innerHTML = ids.map(function(id) {
+                    const item = byId(id);
+                    const position = state.portfolio[id];
+                    const impact = scenarioImpact(item) * position.direction;
+                    return "<tr class='border-b border-white/[.055]'>" +
+                        "<td class='px-5 py-4'><div class='font-mono text-xs'>" + item.ticker + "</div><div class='text-[9px] text-zinc-600 mt-1'>" + item.name + "</div></td>" +
+                        "<td class='px-3'><select class='direction-select bg-black/25 border border-white/[.08] rounded-xl px-2 py-2 text-[10px]' data-id='" + id + "'><option value='1'" + (position.direction === 1 ? " selected" : "") + ">LONG</option><option value='-1'" + (position.direction === -1 ? " selected" : "") + ">SHORT</option></select></td>" +
+                        "<td class='px-3'><div class='flex items-center gap-3'><input class='allocation-range range w-full min-w-[110px]' data-id='" + id + "' type='range' min='0' max='100' step='1' value='" + position.allocation + "'><span class='allocation-value font-mono text-[10px] w-10 text-right'>" + position.allocation + "%</span></div></td>" +
+                        "<td class='px-3 text-right font-mono text-xs " + toneClass(impact) + "'>" + signed(impact,1) + "</td>" +
+                        "<td class='pr-5 text-right'><button class='remove-position text-zinc-600 hover:text-rose-300 w-8 h-8' data-id='" + id + "' type='button'><i class='fa-solid fa-xmark'></i></button></td></tr>";
+                }).join("");
+            }
+            updatePortfolioSummary();
+            renderPortfolioAddOptions();
+        }
+
+        function updatePortfolioSummary() {
+            const entries = Object.keys(state.portfolio).map(function(id) { return { item: byId(id), position: state.portfolio[id] }; });
+            const total = entries.reduce(function(sum,entry) { return sum + entry.position.allocation; },0);
+            document.getElementById("total-allocation").textContent = total + "%";
+            document.getElementById("allocation-warning").textContent = total === 100 ? "Allocation équilibrée" : total < 100 ? (100-total) + "% non alloué" : "Levier " + (total-100) + "%";
+            document.getElementById("allocation-warning").className = total === 100 ? "text-emerald-300" : "text-amber-300";
+
+            let portfolioImpact = 0;
+            entries.forEach(function(entry) {
+                portfolioImpact += scenarioImpact(entry.item) * entry.position.direction * entry.position.allocation / 100;
+            });
+            const impactEl = document.getElementById("portfolio-impact");
+            impactEl.textContent = signed(portfolioImpact,2);
+            impactEl.className = "font-display text-4xl tracking-tighter mt-1 " + toneClass(portfolioImpact);
+            document.getElementById("portfolio-scenario-name").textContent = currentScenario().title;
+
+            const impacts = entries.map(function(entry) {
+                return { item: entry.item, value: scenarioImpact(entry.item) * entry.position.direction * entry.position.allocation / 100 };
+            }).sort(function(a,b) { return Math.abs(b.value)-Math.abs(a.value); });
+            document.getElementById("portfolio-impact-bars").innerHTML = impacts.length ? impacts.map(function(entry) {
+                const width = Math.max(3, Math.abs(entry.value) / Math.max(1, Math.abs(portfolioImpact), 5) * 100);
+                return "<div class='grid grid-cols-[64px_1fr_55px] gap-3 items-center'><span class='font-mono text-[10px]'>" + entry.item.ticker + "</span><div class='h-1.5 bg-white/[.04] rounded-full overflow-hidden'><div class='h-full rounded-full " + (entry.value >= 0 ? "bg-emerald-400" : "bg-rose-400") + "' style='width:" + Math.min(width,100).toFixed(1) + "%'></div></div><span class='font-mono text-[10px] text-right " + toneClass(entry.value) + "'>" + signed(entry.value,2) + "</span></div>";
+            }).join("") : "<div class='text-sm text-zinc-500 py-8 text-center'>Aucune position active.</div>";
+
+            const exposures = factorKeys.map(function(key) {
+                let value = 0;
+                entries.forEach(function(entry) {
+                    value += factorValue(entry.item,key) * entry.position.direction * entry.position.allocation / 100;
+                });
+                return { key: key, value: value };
+            }).sort(function(a,b) { return Math.abs(b.value)-Math.abs(a.value); }).slice(0,6);
+            document.getElementById("portfolio-factors").innerHTML = exposures.map(function(entry) {
+                return "<div class='soft-panel rounded-xl p-3'><div class='text-[9px] text-zinc-500'>" + factorLabels[entry.key] + "</div><div class='font-mono text-xs mt-1.5 " + toneClass(entry.value) + "'>" + (entry.value >= 0 ? "+" : "") + entry.value.toFixed(2) + "</div></div>";
+            }).join("");
+        }
+
+        function renderInsights() {
+            document.getElementById("insight-tabs").innerHTML = insights.map(function(item) {
+                return "<button class='chip rounded-xl px-4 py-2.5 text-[10px] whitespace-nowrap " + (state.insightId === item.id ? "active" : "") + "' data-insight='" + item.id + "' type='button'>" + item.tab + "</button>";
+            }).join("");
+            const insight = insights.find(function(item) { return item.id === state.insightId; });
+            document.getElementById("insight-kicker").textContent = insight.kicker;
+            document.getElementById("insight-title").textContent = insight.title;
+            document.getElementById("insight-summary").textContent = insight.summary;
+            document.getElementById("insight-catalyst").textContent = insight.catalyst;
+            document.getElementById("insight-expression").textContent = insight.expression;
+            document.getElementById("insight-invalidation").textContent = insight.invalidation;
+            document.getElementById("insight-confidence-label").textContent = insight.confidence + "%";
+            document.getElementById("insight-confidence-bar").style.width = insight.confidence + "%";
+        }
+
+        function renderWatchSignals() {
+            document.getElementById("watch-signals").innerHTML = watchSignals.map(function(item,index) {
+                return "<div class='relative pl-5 border-l border-white/[.08]'><span class='absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full' style='background:" + item.color + "'></span>" +
+                    "<div class='flex items-center justify-between gap-3'><div class='text-xs font-semibold'>" + item.title + "</div><span class='text-[8px] tracking-widest' style='color:" + item.color + "'>" + item.priority + "</span></div>" +
+                    "<div class='text-[10px] text-zinc-500 mt-1.5 leading-relaxed'>" + item.text + "</div></div>";
+            }).join("");
+        }
+
+        function showModal(content) {
+            const root = document.getElementById("modal-root");
+            root.innerHTML = "<div class='modal-backdrop fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4'><div class='modal-card panel rounded-[28px] w-full max-w-2xl max-h-[90vh] overflow-auto scrollbar p-6 sm:p-8'>" + content + "</div></div>";
+            root.querySelector(".modal-backdrop").addEventListener("click",function(event) {
+                if (event.target.classList.contains("modal-backdrop")) closeModal();
+            });
+            root.querySelectorAll(".modal-close").forEach(function(button) { button.addEventListener("click",closeModal); });
+        }
+        function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
+
+        function toast(message, tone) {
+            const colors = tone === "success" ? "border-emerald-400/25 text-emerald-300" : "border-indigo-400/25 text-indigo-300";
+            const element = document.createElement("div");
+            element.className = "toast panel border rounded-2xl px-4 py-3 text-xs shadow-2xl " + colors;
+            element.innerHTML = "<i class='fa-solid fa-circle-check mr-2'></i>" + message;
+            document.getElementById("toast-root").appendChild(element);
+            setTimeout(function() { element.remove(); },2200);
+        }
+
+        function exportCorrelationCSV() {
+            const list = matrixPresets[state.matrixPreset].ids.map(byId);
+            let csv = "Actif," + list.map(function(item) { return item.ticker; }).join(",") + "\n";
+            list.forEach(function(row) {
+                csv += row.ticker + "," + list.map(function(col) { return correlation(row,col).toFixed(3); }).join(",") + "\n";
+            });
+            const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "macrolink-matrice-" + state.matrixPreset + ".csv";
+            link.click();
+            URL.revokeObjectURL(url);
+            toast("Matrice CSV exportée","success");
+        }
+
+        function equalWeightPortfolio() {
+            const ids = Object.keys(state.portfolio);
+            if (!ids.length) return;
+            const base = Math.floor(100 / ids.length);
+            let remainder = 100 - base * ids.length;
+            ids.forEach(function(id) {
+                state.portfolio[id].allocation = base + (remainder > 0 ? 1 : 0);
+                if (remainder > 0) remainder--;
+            });
+            renderPortfolio();
+        }
+
+        function resetPortfolio() {
+            state.starred = new Set(["EURUSD","XAU","SPX","NDX","BTC","US10Y"]);
+            state.portfolio = {
+                EURUSD: { allocation: 15, direction: 1 },
+                XAU: { allocation: 20, direction: 1 },
+                SPX: { allocation: 20, direction: 1 },
+                NDX: { allocation: 15, direction: 1 },
+                BTC: { allocation: 10, direction: 1 },
+                US10Y: { allocation: 20, direction: -1 }
+            };
+            renderAssets();
+            renderPortfolio();
+            toast("Portefeuille de démonstration restauré","success");
+        }
+
+        function bindEvents() {
+            document.getElementById("mobile-menu-btn").addEventListener("click",function() {
+                document.getElementById("mobile-menu").classList.toggle("hidden");
+                this.querySelector("i").classList.toggle("fa-bars");
+                this.querySelector("i").classList.toggle("fa-xmark");
+            });
+            document.querySelectorAll("#mobile-menu a").forEach(function(link) {
+                link.addEventListener("click",function() { document.getElementById("mobile-menu").classList.add("hidden"); });
+            });
+            document.getElementById("refresh-btn").addEventListener("click",function() {
+                const now = new Date();
+                document.getElementById("last-update").textContent = now.toLocaleTimeString("fr-FR");
+                if (regimeChart) {
+                    regimeChart.data.datasets[0].data = regimeChart.data.datasets[0].data.map(function(value) { return clamp(value + Math.round((Math.random()-.5)*6),20,90); });
+                    regimeChart.update();
+                }
+                const icon = this.querySelector("i");
+                icon.classList.add("fa-spin");
+                setTimeout(function() { icon.classList.remove("fa-spin"); },650);
+                toast("Radar recalculé — données de démonstration","success");
+            });
+            document.getElementById("asset-search").addEventListener("input",function() { state.search = this.value; renderAssets(); });
+            document.getElementById("asset-sort").addEventListener("change",function() { state.sort = this.value; renderAssets(); });
+            document.getElementById("category-filters").addEventListener("click",function(event) {
+                const button = event.target.closest("[data-category]");
+                if (!button) return;
+                state.category = button.dataset.category;
+                renderAssets();
+            });
+            document.getElementById("asset-table").addEventListener("click",function(event) {
+                const star = event.target.closest(".star-btn");
+                if (star) { toggleStar(star.dataset.id); return; }
+                const detail = event.target.closest(".asset-detail-btn");
+                if (detail) { showAssetDetail(detail.dataset.id); return; }
+                const row = event.target.closest("[data-asset-row]");
+                if (row) showAssetDetail(row.dataset.assetRow);
+            });
+            document.getElementById("clear-stars").addEventListener("click",function() {
+                state.starred.clear();
+                state.portfolio = {};
+                renderAssets();
+                renderPortfolio();
+            });
+            document.getElementById("matrix-presets").addEventListener("click",function(event) {
+                const button = event.target.closest("[data-preset]");
+                if (!button) return;
+                state.matrixPreset = button.dataset.preset;
+                renderCorrelationMatrix();
+            });
+            document.getElementById("correlation-matrix").addEventListener("click",function(event) {
+                const cell = event.target.closest("[data-corr-a]");
+                if (cell) showCorrelationDetail(cell.dataset.corrA,cell.dataset.corrB);
+            });
+            document.getElementById("pair-a").addEventListener("change",updatePairLab);
+            document.getElementById("pair-b").addEventListener("change",updatePairLab);
+            document.getElementById("export-csv").addEventListener("click",exportCorrelationCSV);
+            document.getElementById("scenario-grid").addEventListener("click",function(event) {
+                const button = event.target.closest("[data-scenario]");
+                if (!button) return;
+                state.scenarioId = button.dataset.scenario;
+                renderScenario();
+            });
+            document.getElementById("severity-range").addEventListener("input",function() {
+                state.severity = Number(this.value);
+                renderScenario();
+            });
+            document.getElementById("apply-scenario").addEventListener("click",function() {
+                document.getElementById("portfolio").scrollIntoView({behavior:"smooth"});
+                toast(currentScenario().title + " appliqué au portefeuille","success");
+            });
+            document.getElementById("portfolio-rows").addEventListener("input",function(event) {
+                if (!event.target.classList.contains("allocation-range")) return;
+                const id = event.target.dataset.id;
+                state.portfolio[id].allocation = Number(event.target.value);
+                const row = event.target.closest("tr");
+                row.querySelector(".allocation-value").textContent = event.target.value + "%";
+                updatePortfolioSummary();
+            });
+            document.getElementById("portfolio-rows").addEventListener("change",function(event) {
+                if (!event.target.classList.contains("direction-select")) return;
+                state.portfolio[event.target.dataset.id].direction = Number(event.target.value);
+                renderPortfolio();
+            });
+            document.getElementById("portfolio-rows").addEventListener("click",function(event) {
+                const remove = event.target.closest(".remove-position");
+                if (!remove) return;
+                delete state.portfolio[remove.dataset.id];
+                state.starred.delete(remove.dataset.id);
+                renderAssets();
+                renderPortfolio();
+            });
+            document.getElementById("portfolio-add-btn").addEventListener("click",function() {
+                const id = document.getElementById("portfolio-add-select").value;
+                if (!id) return;
+                state.portfolio[id] = { allocation: 10, direction: 1 };
+                state.starred.add(id);
+                renderAssets();
+                renderPortfolio();
+            });
+            document.getElementById("equal-weight").addEventListener("click",equalWeightPortfolio);
+            document.getElementById("reset-portfolio").addEventListener("click",resetPortfolio);
+            document.getElementById("insight-tabs").addEventListener("click",function(event) {
+                const button = event.target.closest("[data-insight]");
+                if (!button) return;
+                state.insightId = button.dataset.insight;
+                renderInsights();
+            });
+            document.getElementById("regenerate-insight").addEventListener("click",function() {
+                const index = insights.findIndex(function(item) { return item.id === state.insightId; });
+                state.insightId = insights[(index + 1) % insights.length].id;
+                renderInsights();
+                toast("Synthèse suivante chargée","success");
+            });
+            document.addEventListener("keydown",function(event) { if (event.key === "Escape") closeModal(); });
+        }
+
+        function initSectionObserver() {
+            const links = Array.from(document.querySelectorAll(".nav-link"));
+            const sections = links.map(function(link) { return document.querySelector(link.getAttribute("href")); }).filter(Boolean);
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (!entry.isIntersecting) return;
+                    links.forEach(function(link) { link.classList.toggle("active",link.getAttribute("href") === "#" + entry.target.id); });
+                });
+            },{ rootMargin: "-35% 0px -58% 0px" });
+            sections.forEach(function(section) { observer.observe(section); });
+        }
+
+        function init() {
+            renderHero();
+            renderMacroMetrics();
+            renderFactorPulse();
+            renderAssets();
+            renderCorrelationMatrix();
+            populatePairSelectors();
+            renderScenario();
+            renderInsights();
+            renderWatchSignals();
+            bindEvents();
+            initRegimeChart();
+            updatePairLab();
+            initSectionObserver();
+            document.getElementById("last-update").textContent = new Date().toLocaleTimeString("fr-FR");
+        }
+
+        window.addEventListener("DOMContentLoaded",init);
+    </script>
+</body>
+</html>
